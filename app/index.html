@@ -1,0 +1,72 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>plotty.js</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <!-- build:css(.tmp) styles/main.css -->
+            <link rel="stylesheet" href="styles/main.css" />
+        <!-- endbuild -->
+
+        <!-- build:css(.tmp) styles/plotty.css -->
+            <link rel="stylesheet" href="styles/plotty.css" />
+        <!-- endbuild -->
+
+
+
+    </head>
+    <body>
+        <!--[if lt IE 10]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <div> <h1>plotty.js</h1> </div>
+        <canvas id="canvas1" style="height: 900px; width:1200px;"></canvas>
+        <div style="float:right; margin-right: 100px;">
+            <span style="width:100%; margin-bottom: 2em;">
+                <select style="width:100%;" id="colorscaleselect">
+                  <option value="jet">jet</option>
+                  <option value="rainbow">rainbow</option>
+                  <option value="viridis">viridis approximation</option>
+                  <option value="test">test</option>
+                </select>
+            </span></br>
+            <span><input id="min" type="range"/><label for="min" id="min_label"></label></span>
+            <span><input id="max" type="range"/><label for="max" id="max_label"></label></span>
+        </div>
+
+
+        <!-- build:js scripts/vendor.js -->
+        <!-- bower:js -->
+        <!-- endbower -->
+        <!-- endbuild -->
+
+
+        <script src="components/underscore/underscore-min.js"></script>
+
+        
+
+		<!-- build:js scripts/plotty.min.js -->
+        <script src="components/chroma-js/chroma.js"></script>
+        <script src="scripts/vendor/rgbcolor.js"></script>
+        <script src="scripts/vendor/canvg.js"></script>
+        <script src="scripts/testdata.js"></script>
+        <script src="data/LST.js"></script>
+        <script src="scripts/plotty.js"></script>
+        <!-- endbuild -->
+
+
+        <!-- build:js scripts/main.js -->
+        <script src="scripts/main.js"></script>
+        <!-- endbuild -->
+
+
+
+</body>
+</html>
