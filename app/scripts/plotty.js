@@ -70,22 +70,26 @@ var plotty = new function() {
     this.plot = function (domain, el, data, width, height) {
        this.domain = domain;
        this.data = data;
+
        el.width = width;
        el.height = height;
+
+       this.el = el;
+
        this.ctx = el.getContext("2d");
 
        this.width = width;
        this.height = height;
-       this.ctx.scale(3,1);
+       
        this.colorscale = jet;
        this.colorscale.domain(this.domain, 200);
-       this.imageData = this.ctx.createImageData(this.width, this.height);
+       //this.imageData = this.ctx.createImageData(this.width, this.height);
     };
 
-    this.plot.prototype.updateDomain = function updateDomain(domain){
+    this.plot.prototype.updateDomain = function updateDomain(domain,subsample){
     	this.domain = domain;
     	this.colorscale.domain(this.domain, 200);
-    	this.render();
+    	this.render(subsample);
     };
 
     this.plot.prototype.updateScale = function updateScale(scale){
@@ -104,32 +108,64 @@ var plotty = new function() {
     	}
     };
 
-    this.plot.prototype.render = function render(){
+    this.plot.prototype.render = function render(subsample){
 
     	var t0 = performance.now();
 
-      var arraySize = this.width * this.height;
+      if (!subsample) {subsample=1;};
+      var subset = subsample;
+      //var subset = 1;
 
-      for (var idx = 0; idx < arraySize; idx++) {
+      var w_sub = Math.floor(this.width/subset);
+      var h_sub = Math.floor(this.height/subset);
+
+      this.el.width = w_sub;
+      this.el.height = h_sub;
+
+      this.imageData = this.ctx.createImageData(w_sub, h_sub);
+
+      for (var y = 0; y <= h_sub; y++) {
+        for (var x = 0; x <= w_sub; x++) {
+        
+
+          var i = (((y*subset)+1)*this.width)+((x+1)*subset);
+
+          var index = ((y*w_sub)+x)*4;
+
+      		if(this.data[i]==0){
+            this.imageData.data[index+0] = 0;
+            this.imageData.data[index+1] = 0;
+            this.imageData.data[index+2] = 0;
+            this.imageData.data[index+3] = 0;
+          } else{
+            var c = this.colorscale(this.data[i])._rgb;
+
+            this.imageData.data[index+0] = c[0];
+            this.imageData.data[index+1] = c[1];
+            this.imageData.data[index+2] = c[2];
+            this.imageData.data[index+3] = 255;
+          }
+
+        }
+      }
+
+      /*var arraylength = this.width * this.height;
+      for (var idx = 0; idx <= arraylength; idx++) {
         var index = idx*4;
-    		if(this.data[idx]==0){
+        if(this.data[idx]==0){
           this.imageData.data[index+0] = 0;
           this.imageData.data[index+1] = 0;
           this.imageData.data[index+2] = 0;
           this.imageData.data[index+3] = 0;
         } else{
-          var index = idx*4;
           var c = this.colorscale(this.data[idx])._rgb;
-          //var c = [1,0,0,1];
 
           this.imageData.data[index+0] = c[0];
           this.imageData.data[index+1] = c[1];
           this.imageData.data[index+2] = c[2];
           this.imageData.data[index+3] = 255;
         }
-
-
-      }
+      }*/
 
     var t1 = performance.now();
     looptime+=(t1-t0);

@@ -27,8 +27,10 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div> <h1>plotty.js</h1> </div>
-        <canvas id="canvas1" style="height: 900px; width:1200px;"></canvas>
+        <canvas id="canvas1" style="height: 90%; width: 50%;"></canvas>
         <div style="float:right; margin-right: 100px;">
+            <input type="file" id="files" name="files[]" multiple />
+            <output id="list"></output>
             <span style="width:100%; margin-bottom: 2em;">
                 <select style="width:100%;" id="colorscaleselect">
                   <option value="jet">jet</option>
@@ -53,11 +55,7 @@
         
 
 		<!-- build:js scripts/plotty.min.js -->
-        <script src="components/chroma-js/chroma.js"></script>
-        <script src="scripts/vendor/rgbcolor.js"></script>
-        <script src="scripts/vendor/canvg.js"></script>
-        <script src="scripts/testdata.js"></script>
-        <script src="data/LST.js"></script>
+        <script src="components/chroma-js/chroma.min.js"></script>
         <script src="scripts/plotty.js"></script>
         <!-- endbuild -->
 

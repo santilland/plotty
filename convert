@@ -1,0 +1,4 @@
+
+gdal_translate -of AAIGrid -a_srs EPSG:4326 'HDF4_EOS:EOS_SWATH:"MOD11_L2.A2015001.0030.005.2015005161910.hdf":MOD_Swath_LST:LST' LST4
+
+sed -i -- 's/\s/,/g' LST4
