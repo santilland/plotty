@@ -43,6 +43,16 @@ function scaleImageData(imageData, scale) {
     return scaled;
 }
 
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    var ratio_x = canvas.width/evt.target.offsetWidth;
+    var ratio_y = canvas.height/evt.target.offsetHeight;
+    return {
+      x: Math.round((evt.clientX - rect.left)*ratio_x),
+      y: Math.round((evt.clientY - rect.top)*ratio_y)
+    };
+}
+
 
 var plotty = new function() {
 
@@ -67,7 +77,7 @@ var plotty = new function() {
 	
 	
     // Plot tool
-    this.plot = function (domain, el, data, width, height) {
+    this.plot = function (domain, el, data, width, height, callback_value) {
        this.domain = domain;
        this.data = data;
 
@@ -83,7 +93,15 @@ var plotty = new function() {
        
        this.colorscale = jet;
        this.colorscale.domain(this.domain, 200);
-       //this.imageData = this.ctx.createImageData(this.width, this.height);
+       this.imageData = null;
+
+       var self = this;
+
+       function mouseovervalue(e) {
+          var pos = getMousePos(self.el, e);
+          callback_value(self.data[(pos.y*this.width)+pos.x]);
+        }
+        this.el.addEventListener('mousemove', mouseovervalue, false);
     };
 
     this.plot.prototype.updateDomain = function updateDomain(domain,subsample){
@@ -114,7 +132,6 @@ var plotty = new function() {
 
       if (!subsample) {subsample=1;};
       var subset = subsample;
-      //var subset = 1;
 
       var w_sub = Math.floor(this.width/subset);
       var h_sub = Math.floor(this.height/subset);
@@ -148,24 +165,6 @@ var plotty = new function() {
 
         }
       }
-
-      /*var arraylength = this.width * this.height;
-      for (var idx = 0; idx <= arraylength; idx++) {
-        var index = idx*4;
-        if(this.data[idx]==0){
-          this.imageData.data[index+0] = 0;
-          this.imageData.data[index+1] = 0;
-          this.imageData.data[index+2] = 0;
-          this.imageData.data[index+3] = 0;
-        } else{
-          var c = this.colorscale(this.data[idx])._rgb;
-
-          this.imageData.data[index+0] = c[0];
-          this.imageData.data[index+1] = c[1];
-          this.imageData.data[index+2] = c[2];
-          this.imageData.data[index+3] = 255;
-        }
-      }*/
 
     var t1 = performance.now();
     looptime+=(t1-t0);

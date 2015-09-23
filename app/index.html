@@ -18,6 +18,7 @@
         <!-- build:css(.tmp) styles/plotty.css -->
             <link rel="stylesheet" href="styles/plotty.css" />
         <!-- endbuild -->
+        <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
 
 
 
@@ -39,9 +40,12 @@
                   <option value="test">test</option>
                 </select>
             </span></br>
-            <span><input id="min" type="range"/><label for="min" id="min_label"></label></span>
-            <span><input id="max" type="range"/><label for="max" id="max_label"></label></span>
+            <span style="width:49%;"><input id="min" type="range"/><label for="min" id="min_label"></label></span>
+            <span style="width:49%;"><input id="max" type="range"/><label for="max" id="max_label"></label></span><br/>
+            <span style="margin-top:3em;"><div id="measurevalue"></div></span>
         </div>
+
+
 
 
         <!-- build:js scripts/vendor.js -->
