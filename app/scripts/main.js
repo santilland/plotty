@@ -1,7 +1,7 @@
 
 
 var width = 1354;
-var height = 2040;
+var height = 2030;
 
 var min_range = 11000;
 var max_range = 13600;

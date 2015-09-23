@@ -15,6 +15,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-release');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-bump');
 
     grunt.initConfig({
         // configurable paths
@@ -97,7 +98,6 @@ module.exports = function (grunt) {
             all: [
                 'Gruntfile.js',
                 '<%= yeoman.app %>/scripts/{,*/}*.js',
-                '!<%= yeoman.app %>/scripts/vendor/*',
                 'test/spec/{,*/}*.js'
             ]
         },
@@ -276,16 +276,6 @@ module.exports = function (grunt) {
                 src: '{,*/}*.css'
             }
         },
-        modernizr: {
-            devFile: '<%= yeoman.app %>/components/modernizr/modernizr.js',
-            outputFile: '<%= yeoman.dist %>/components/modernizr/modernizr.js',
-            files: [
-                '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                '<%= yeoman.dist %>/styles/{,*/}*.css',
-                '!<%= yeoman.dist %>/scripts/vendor/*'
-            ],
-            uglify: true
-        },
         concurrent: {
             server: [
                 'compass',
@@ -313,15 +303,33 @@ module.exports = function (grunt) {
                 github: false
             }
         },
+        bump: {
+            options: {
+                files: ['package.json', 'bower.json'],
+                updateConfigs: [],
+                commit: true,
+                commitMessage: 'Release v%VERSION%',
+                commitFiles: ['package.json'],
+                createTag: true,
+                tagName: 'v%VERSION%',
+                tagMessage: 'Version %VERSION%',
+                push: true,
+                pushTo: 'upstream',
+                gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
+                globalReplace: false,
+                prereleaseName: false,
+                regExp: false
+            }
+        },
         compress: {
             release: {
                 options: {
-                    archive: 'release/analytics.zip'
+                    archive: 'release/plotty.zip'
                 },
                 files: [
-                    { expand: true, cwd: '<%= yeoman.dist %>/scripts', src: ['*.min.js'], dest: 'analytics' },
-                    { expand: true, cwd: '<%= yeoman.dist %>/styles', src: ['*.min.css'], dest: 'analytics' },
-                    { expand: true, src: ['README.md'], dest: 'analytics' }
+                    { expand: true, cwd: '<%= yeoman.dist %>/scripts', src: ['*.min.js'], dest: 'plotty' },
+                    { expand: true, cwd: '<%= yeoman.dist %>/styles', src: ['*.min.css'], dest: 'plotty' },
+                    { expand: true, src: ['README.md'], dest: 'plotty' }
                 ]
             }
         }
@@ -356,7 +364,6 @@ module.exports = function (grunt) {
         'concat',
         'cssmin',
         'uglify',
-        'modernizr',
         'copy:dist',
         'usemin'
     ]);
