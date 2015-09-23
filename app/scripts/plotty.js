@@ -58,26 +58,24 @@ var plotty = new function() {
 
     
     // Colorscale definitions
-    var rainbow = 	chroma.scale(
-                       ['#96005A', '#0000C8', '#0019FF', '#0098FF', '#2CFF96', '#97FF00', '#FFEA00', '#FF6F00', 'FF0000'], // colors
-                       [0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
-                   	);
-    var jet = 		chroma.scale(
-                       ['#000083', '#003CAA', '#05FFFF', '#FFFF00', '#FA0000', '#800000'], // colors
-                       [0, .125, 0.375, 0.625, 0.875, 1]  // positions
-                   	); 
-    var test = 		chroma.scale(
-                       ['#000', '#800000'], // colors
-                       [0, 1]  // positions
-                   	); 
-    var viridis =    chroma.scale(
-                       ['#440154', '#472b7a', '#3b518a', '#2c718e', '#218e8c', '#26ac81', '#59c764', '#a7db33', '#fde724'], // colors
-                       [0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
-                    ); 
+    var colorscales = {
+      "rainbow": chroma.scale(
+        ['#96005A', '#0000C8', '#0019FF', '#0098FF', '#2CFF96', '#97FF00', '#FFEA00', '#FF6F00', 'FF0000'], // colors
+        [0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
+      ),
+      "jet": chroma.scale(
+        ['#000083', '#003CAA', '#05FFFF', '#FFFF00', '#FA0000', '#800000'], // colors
+        [0, .125, 0.375, 0.625, 0.875, 1]  // positions
+     	),
+      "viridis": chroma.scale(
+        ['#440154', '#472b7a', '#3b518a', '#2c718e', '#218e8c', '#26ac81', '#59c764', '#a7db33', '#fde724'], // colors
+        [0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
+      )
+    };
 	
 	
     // Plot tool
-    this.plot = function (domain, el, data, width, height, callback_value) {
+    this.plot = function (domain, el, data, width, height, callback_value, scale_id) {
        this.domain = domain;
        this.data = data;
 
@@ -91,7 +89,8 @@ var plotty = new function() {
        this.width = width;
        this.height = height;
        
-       this.colorscale = jet;
+       if (!scale_id) scale_id="jet";
+       this.colorscale = colorscales[scale_id];
        this.colorscale.domain(this.domain, 200);
        this.imageData = null;
 
@@ -111,16 +110,8 @@ var plotty = new function() {
     };
 
     this.plot.prototype.updateScale = function updateScale(scale){
-    	var cs = null;
-    	switch(scale){
-    		case "jet": cs = jet; break;
-    		case "rainbow": cs = rainbow; break;
-        case "viridis": cs = viridis; break;
-    		case "test": cs = test; break;
-    	}
-
-    	if (cs){
-    		this.colorscale = cs;
+    	if (colorscales[scale]){
+    		this.colorscale = colorscales[scale];
     		this.colorscale.domain(this.domain, 200);
     		this.render();
     	}
@@ -141,11 +132,17 @@ var plotty = new function() {
 
       this.imageData = this.ctx.createImageData(w_sub, h_sub);
 
-      for (var y = 0; y <= h_sub; y++) {
-        for (var x = 0; x <= w_sub; x++) {
+      for (var y = 0; y < h_sub; y++) {
+        for (var x = 0; x < w_sub; x++) {
         
 
-          var i = (((y*subset)+1)*this.width)+((x+1)*subset);
+          var i = (((y*subset))*this.width)+((x)*subset);
+
+          // TODO: Think about this, when subsampling there is a displacement
+          // this helps reduce this but there is probably a better way
+          if(subset>1){
+            i = (((y*subset)+1)*this.width)+((x+1)*subset);
+          }
 
           var index = ((y*w_sub)+x)*4;
 
