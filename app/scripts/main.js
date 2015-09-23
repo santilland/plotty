@@ -21,6 +21,8 @@ var looptime = 0;
 
 var plot = false;
 
+var colorscale_id = false;
+
 
 //var farray = new Float32Array(width*height);
 
@@ -50,32 +52,55 @@ function showvalue (val) {
 }
 
 
-  function handleFileSelect(evt) {
-    var files = evt.target.files; // FileList object
+function handleFileSelect(evt) {
+	var files = evt.target.files; // FileList object
 
-    // Loop through the FileList and render image files as thumbnails.
-    for (var i = 0, f; f = files[i]; i++) {
+	// Loop through the FileList and render image files as thumbnails.
+	for (var i = 0, f; f = files[i]; i++) {
 
-      // Only process image files.
-     /* if (!f.type.match('image.*')) {
-        continue;
-      }*/
-
-      var reader = new FileReader();
-      reader.onload = function (e) {
-	        var data = new Uint16Array(e.target.result);
-	        plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue);
+  		var reader = new FileReader();
+  		reader.onload = function (e) {
+        	var data = new Uint16Array(e.target.result);
+        	plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
 			plot.render();
-	    };
-	    reader.onerror = function (e) {
-	        console.error(e);
-	    };
+    	};
+    	reader.onerror = function (e) {
+        	console.error(e);
+    	};
 
-      reader.readAsArrayBuffer(f);
-    }
-  }
+  		reader.readAsArrayBuffer(f);
+	}
+}
 
-  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+
+// Generate data
+var ex_width = 100;
+var ex_height = 100;
+var exampledata = new Float32Array(ex_height*ex_width);
+
+var xoff = ex_width / 3; // offsets to "center"
+var yoff = ex_height / 3;
+
+// walk left-to-right, top-to-bottom; it's the
+// same as the ordering in the imagedata array:
+
+for (y = 0; y <= height; y++) {
+	for (x = 0; x <= width; x++) {
+		// calculate sine based on distance
+		x2 = x - xoff;
+		y2 = y - yoff;
+		d = Math.sqrt(x2*x2 + y2*y2);
+		t = Math.sin(d/6.0);
+
+		// save sine
+		exampledata[(y*ex_width)+x] = t;
+	}
+}
+
+plot = new plotty.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
+plot.render();
 
 
 /*for (var i=100; i>0; i--){
@@ -131,6 +156,7 @@ max_range_slider.onchange=function(){
 };
 
 colorscaleselect.onchange=function(){
+	colorscale_id = this.value;
 	if(plot)
 		plot.updateScale(this.value);
 };
