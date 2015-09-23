@@ -6,6 +6,11 @@ body{
     height: 100%;
     margin: 0;
     position: absolute;
+    font-family: 'Droid Sans', sans-serif;
+}
+
+h1{
+    margin-left: 1em;
 }
 
 
@@ -28,3 +33,4 @@ span label {
     top:0.5em; 
     text-align: center; 
 }  
+

@@ -4,7 +4,7 @@ var width = 1354;
 var height = 2040;
 
 var min_range = 11000;
-var max_range = 13000;
+var max_range = 13600;
 
 /*var width = 361;
 var height = 180;
@@ -34,12 +34,20 @@ var max_range_slider = document.getElementById("max");
 min_range_slider.max = max_range;
 min_range_slider.min = min_range;
 min_range_slider.value = min_range;
-document.getElementById("min_label").innerHTML = min_range;
+var min_label = document.getElementById("min_label");
+min_label.innerHTML = min_range;
 
 max_range_slider.max = max_range;
 max_range_slider.min = min_range;
 max_range_slider.value = max_range;
-document.getElementById("max_label").innerHTML = max_range;
+var max_label = document.getElementById("max_label");
+max_label.innerHTML = max_range;
+
+var measurevalue = document.getElementById("measurevalue");
+
+function showvalue (val) {
+	measurevalue.innerHTML = "Value: "+val;
+}
 
 
   function handleFileSelect(evt) {
@@ -56,7 +64,7 @@ document.getElementById("max_label").innerHTML = max_range;
       var reader = new FileReader();
       reader.onload = function (e) {
 	        var data = new Uint16Array(e.target.result);
-	        plot = new plotty.plot([min_range,max_range], el, data, width, height);
+	        plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue);
 			plot.render();
 	    };
 	    reader.onerror = function (e) {
@@ -83,6 +91,7 @@ min_range_slider.oninput=function(){
 	if(plot){
 		now = new Date().getTime();
 		min_range = parseFloat(this.value);
+		min_label.innerHTML = min_range;
 		if (now - lastupdate>20)
 			plot.updateDomain([min_range, max_range],3);
 		lastupdate = now;
@@ -104,6 +113,7 @@ max_range_slider.oninput=function(){
 	if(plot){
 		now = new Date().getTime();
 		max_range = parseFloat(this.value);
+		max_label.innerHTML = max_range;
 		if (now - lastupdate>20)
 			plot.updateDomain([min_range, max_range],3);
 		lastupdate = now;
