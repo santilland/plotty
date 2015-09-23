@@ -1,10 +1,8 @@
 {
   "name": "plotty",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "dependencies": {
-    "chroma-js": "~1.0.0",
-    "modernizr": "~2.6.2",
-    "underscore": "~1.5.2"
+    "chroma-js": "1.0.0"
   },
   "ignore": [
     "**/.*",
