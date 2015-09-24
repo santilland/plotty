@@ -51,7 +51,16 @@ plot.render();
  ```
 
 
- Result rendering
-![Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10050683/dd814e46-621d-11e5-9b63-2d0d5b81e0bd.png)
+| Result renderings  |
+|:------------------:|
+| ![Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10050683/dd814e46-621d-11e5-9b63-2d0d5b81e0bd.png) |
+| ![Second Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10069591/65034254-62ad-11e5-81e1-19a91ee46a5c.png) |
+
+
+
+
+
+
+
  
 
