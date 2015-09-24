@@ -83,9 +83,6 @@ var exampledata = new Float32Array(ex_height*ex_width);
 var xoff = ex_width / 3; // offsets to "center"
 var yoff = ex_height / 3;
 
-// walk left-to-right, top-to-bottom; it's the
-// same as the ordering in the imagedata array:
-
 for (y = 0; y <= height; y++) {
 	for (x = 0; x <= width; x++) {
 		// calculate sine based on distance
