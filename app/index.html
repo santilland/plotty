@@ -25,7 +25,8 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div> <h1>plotty.js</h1> </div>
-        <canvas id="canvas1" style="height: 90%; width: 50%;"></canvas>
+        <canvas id="canvas" style="height: 90%; width: 50%;" width="500" height="500"></canvas>
+        <!--<canvas id="canvas1" style="height: 500px; width: 500px;" width="500" height="500"></canvas>-->
         <div style="float:right; margin-right: 100px;">
             <input type="file" id="files" name="files[]" multiple />
             <output id="list"></output>
@@ -39,20 +40,13 @@
             <span style="width:49%;"><input id="min" type="range"/><label for="min" id="min_label"></label></span>
             <span style="width:49%;"><input id="max" type="range"/><label for="max" id="max_label"></label></span><br/>
             <span style="margin-top:3em;"><div id="measurevalue"></div></span>
+            <div id="colorscale"></div>
         </div>
-        
 
-		<!-- build:js scripts/plotty.min.js -->
-        <script src="components/chroma-js/chroma.min.js"></script>
-        <script src="scripts/plotty.js"></script>
-        <!-- endbuild -->
-
-
-        <!-- build:js scripts/main.js -->
-        <script src="scripts/main.js"></script>
-        <!-- endbuild -->
-
-
-
+<script src="components/chroma-js/chroma.min.js"></script>
+<script src="components/twgl.js/dist/twgl-full.min.js"></script>
+<script src="scripts/plotty.js"></script>
+<script src="scripts/plotty2.js"></script>
+<script src="scripts/main.js"></script>
 </body>
 </html>
