@@ -46,6 +46,8 @@ void main() {
 }`;
 
   var plot = function(canvas, data, width, height, scaleImage, domain) {
+    canvas.width = width;
+    canvas.height = height;
     var gl = this.gl = create3DContext(canvas);
     if (!gl || !gl.getExtension('OES_texture_float')) {
       throw new Error("The Browser does not support WebGL or the float texture.");

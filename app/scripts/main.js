@@ -3,8 +3,8 @@
 var width = 1354;
 var height = 2030;
 
-var min_range = 11000;
-var max_range = 13600;
+var min_range = 220;
+var max_range = 300;
 
 /*var width = 361;
 var height = 180;
@@ -51,6 +51,17 @@ function showvalue (val) {
 	measurevalue.innerHTML = "Value: "+val;
 }
 
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.responseType = "arraybuffer";
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.response);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
 
 var colorscales = {
 	"rainbow": chroma.scale(
@@ -77,6 +88,7 @@ function handleFileSelect(evt) {
   		var reader = new FileReader();
   		reader.onload = function (e) {
         	var data = new Uint16Array(e.target.result);
+
         	//plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
 					plot.setData(data, 1354, 2040);
 			plot.render();
@@ -90,6 +102,24 @@ function handleFileSelect(evt) {
 }
 
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+
+
+function handleProductSelect(evt) {
+	var request_url = "http://localhost:8080/ows?service=WPS&version=1.0.0&request=Execute&identifier=getArrayBuffer&DataInputs=coverage_id="+this.value+"&rawdataoutput=output";
+	httpGetAsync(request_url, function (response) {
+		var data = new Float32Array(response);
+        	var l = data.length;
+        	plot = new plotty2.plot(el, data, data[l-2], data[l-1], document.getElementById("rainbow"), [min_range, max_range]);
+        	plot.setScale(colorscales["viridis"]);
+			plot.setClamp(true);
+			plot.render();
+
+	});
+}
+
+document.getElementById('productselect').addEventListener('change', handleProductSelect, false);
+
 
 
 // Generate data
@@ -113,38 +143,15 @@ for (y = 0; y <= height; y++) {
 	}
 }*/
 
-var xhr = new XMLHttpRequest();
-xhr.open('GET', 'data/FSL_2015051619.blob', true);
-xhr.responseType = 'arraybuffer';
-
-xhr.onload = function(e) {
-  var responseArray = new Uint16Array(this.response);
-	plot = new plotty2.plot(el, responseArray, 1354, 2040, document.getElementById("rainbow"), [11000, 13600]);
-	colorscaleselect.onchange();
-	plot.setClamp(false);
-	plot.render();
-};
-
-xhr.send();
-
-//plot = new plotty2.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
-//plot = new plotty2.plot(el, exampledata, ex_width, ex_height, document.getElementById("rainbow"), [11000, 13600]);
+//plot = new plotty.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
 //plot.render();
 
-
-/*for (var i=100; i>0; i--){
-	min_range = (i/100)*80;
-	plot.updateDomain([min_range, max_range]);
-}
-
-console.log("Looptime: "+looptime);
-console.log("Render time: "+rendertime);*/
 
 
 min_range_slider.oninput=function(){
 	if(plot){
 		min_range = parseFloat(this.value);
-		min_label.innerHTML = min_range;
+		min_range.innerHTML = min_range;
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
 	}
@@ -162,6 +169,7 @@ min_range_slider.onchange=function(){
 
 max_range_slider.oninput=function(){
 	if(plot){
+		now = new Date().getTime();
 		max_range = parseFloat(this.value);
 		max_label.innerHTML = max_range;
 		plot.setDomain([min_range, max_range],3);
@@ -171,6 +179,7 @@ max_range_slider.oninput=function(){
 
 max_range_slider.onchange=function(){
 	if(plot){
+		now = new Date().getTime();
 		max_range = parseFloat(this.value);
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
@@ -187,10 +196,14 @@ colorscaleselect.onchange=function(){
 		while (myNode.firstChild) {
 		  myNode.removeChild(myNode.firstChild);
 		}
-		var scaleImage = plot.getScaleImage();
+		/*var scaleImage = plot.getScaleImage();
 		scaleImage.style.width = "500px";
 		scaleImage.style.height = "20px";
 		document.body.appendChild(scaleImage);
-		myNode.appendChild(scaleImage);
+		myNode.appendChild(scaleImage);*/
 	}
 };
+
+
+
+

@@ -34,3 +34,11 @@ span label {
     text-align: center; 
 }  
 
+#controls{
+    position: absolute;
+    right: 30px;
+    top: 20px;
+    background-color: rgba(255,255,255,0.9);
+    padding: 25px;
+}
+
