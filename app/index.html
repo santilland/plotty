@@ -25,7 +25,7 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div> <h1>plotty.js</h1> </div>
-        <canvas id="canvas1" style="height: 90%; width: 50%;"></canvas>
+        <canvas id="canvas1" style="width: 70%;"></canvas>
         <div style="float:right; margin-right: 100px;">
             <input type="file" id="files" name="files[]" multiple />
             <output id="list"></output>
@@ -34,6 +34,58 @@
                     <option value="viridis">viridis approximation</option>
                     <option value="jet">jet</option>
                     <option value="rainbow">rainbow</option>
+                </select>
+            </span></br>
+            <span style="width:100%; margin-bottom: 2em;">
+                <select style="width:100%;" id="productselect">
+                    <option value="MOD11_L2.A2015001.0020.005.2015005181103">MOD11_L2.A2015001.0020.005.2015005181103</option>
+                    <option value="MOD11_L2.A2015001.1515.005.2015005165233">MOD11_L2.A2015001.1515.005.2015005165233</option>
+                    <option value="MOD11_L2.A2015001.2005.005.2015005184751">MOD11_L2.A2015001.2005.005.2015005184751</option>
+                    <option value="MOD11_L2.A2015001.1825.005.2015005184349">MOD11_L2.A2015001.1825.005.2015005184349</option>
+                    <option value="MOD11_L2.A2015001.1840.005.2015005165953">MOD11_L2.A2015001.1840.005.2015005165953</option>
+                    <option value="MOD11_L2.A2015001.1040.005.2015005183113">MOD11_L2.A2015001.1040.005.2015005183113</option>
+                    <option value="MOD11_L2.A2015001.1220.005.2015005183322">MOD11_L2.A2015001.1220.005.2015005183322</option>
+                    <option value="MOD11_L2.A2015001.1650.005.2015005183959">MOD11_L2.A2015001.1650.005.2015005183959</option>
+                    <option value="MOD11_L2.A2015001.0015.005.2015005162430">MOD11_L2.A2015001.0015.005.2015005162430</option>
+                    <option value="MOD11_L2.A2015001.0855.005.2015005164323">MOD11_L2.A2015001.0855.005.2015005164323</option>
+                    <option value="MOD11_L2.A2015001.1205.005.2015005164757">MOD11_L2.A2015001.1205.005.2015005164757</option>
+                    <option value="MOD11_L2.A2015001.2155.005.2015005170454">MOD11_L2.A2015001.2155.005.2015005170454</option>
+                    <option value="MOD11_L2.A2015001.0540.005.2015005182200">MOD11_L2.A2015001.0540.005.2015005182200</option>
+                    <option value="MOD11_L2.A2015001.1700.005.2015005165713">MOD11_L2.A2015001.1700.005.2015005165713</option>
+                    <option value="MOD11_L2.A2015001.1705.005.2015005165759">MOD11_L2.A2015001.1705.005.2015005165759</option>
+                    <option value="MOD11_L2.A2015001.2145.005.2015005185000">MOD11_L2.A2015001.2145.005.2015005185000</option>
+                    <option value="MOD11_L2.A2015001.1035.005.2015005182955">MOD11_L2.A2015001.1035.005.2015005182955</option>
+                    <option value="MOD11_L2.A2015001.0025.005.2015005161748">MOD11_L2.A2015001.0025.005.2015005161748</option>
+                    <option value="MOD11_L2.A2015001.1830.005.2015005184456">MOD11_L2.A2015001.1830.005.2015005184456</option>
+                    <option value="MOD11_L2.A2015001.1355.005.2015005183557">MOD11_L2.A2015001.1355.005.2015005183557</option>
+                    <option value="MOD11_L2.A2015001.0545.005.2015005182256">MOD11_L2.A2015001.0545.005.2015005182256</option>
+                    <option value="MOD11_L2.A2015001.0030.005.2015005161910">MOD11_L2.A2015001.0030.005.2015005161910</option>
+                    <option value="MOD11_L2.A2015001.1350.005.2015005165136">MOD11_L2.A2015001.1350.005.2015005165136</option>
+                    <option value="MOD11_L2.A2015001.0900.005.2015005182739">MOD11_L2.A2015001.0900.005.2015005182739</option>
+                    <option value="MOD11_L2.A2015001.1210.005.2015005164843">MOD11_L2.A2015001.1210.005.2015005164843</option>
+                    <option value="MOD11_L2.A2015001.1340.005.2015005164948">MOD11_L2.A2015001.1340.005.2015005164948</option>
+                    <option value="MOD11_L2.A2015001.0710.005.2015005163732">MOD11_L2.A2015001.0710.005.2015005163732</option>
+                    <option value="MOD11_L2.A2015001.2010.005.2015005184826">MOD11_L2.A2015001.2010.005.2015005184826</option>
+                    <option value="MOD11_L2.A2015001.1655.005.2015005165615">MOD11_L2.A2015001.1655.005.2015005165615</option>
+                    <option value="MOD11_L2.A2015001.0905.005.2015005164042">MOD11_L2.A2015001.0905.005.2015005164042</option>
+                    <option value="MOD11_L2.A2015001.1525.005.2015005165420">MOD11_L2.A2015001.1525.005.2015005165420</option>
+                    <option value="MOD11_L2.A2015001.1520.005.2015005165333">MOD11_L2.A2015001.1520.005.2015005165333</option>
+                    <option value="MOD11_L2.A2015001.0715.005.2015005163843">MOD11_L2.A2015001.0715.005.2015005163843</option>
+                    <option value="MOD11_L2.A2015001.0725.005.2015005163723">MOD11_L2.A2015001.0725.005.2015005163723</option>
+                    <option value="MOD11_L2.A2015001.2020.005.2015005170301">MOD11_L2.A2015001.2020.005.2015005170301</option>
+                    <option value="MOD11_L2.A2015001.1030.005.2015005164612">MOD11_L2.A2015001.1030.005.2015005164612</option>
+                    <option value="MOD11_L2.A2015001.0720.005.2015005182603">MOD11_L2.A2015001.0720.005.2015005182603</option>
+                    <option value="MOD11_L2.A2015001.0850.005.2015005164214">MOD11_L2.A2015001.0850.005.2015005164214</option>
+                    <option value="MOD11_L2.A2015001.1835.005.2015005165855">MOD11_L2.A2015001.1835.005.2015005165855</option>
+                    <option value="MOD11_L2.A2015001.1025.005.2015005164526">MOD11_L2.A2015001.1025.005.2015005164526</option>
+                    <option value="MOD11_L2.A2015001.2140.005.2015005170503">MOD11_L2.A2015001.2140.005.2015005170503</option>
+                    <option value="MOD11_L2.A2015001.1215.005.2015005183251">MOD11_L2.A2015001.1215.005.2015005183251</option>
+                    <option value="MOD11_L2.A2015001.1345.005.2015005165034">MOD11_L2.A2015001.1345.005.2015005165034</option>
+                    <option value="MOD11_L2.A2015001.2150.005.2015005185033">MOD11_L2.A2015001.2150.005.2015005185033</option>
+                    <option value="MOD11_L2.A2015001.1045.005.2015005164414">MOD11_L2.A2015001.1045.005.2015005164414</option>
+                    <option value="MOD11_L2.A2015001.2015.005.2015005170148">MOD11_L2.A2015001.2015.005.2015005170148</option>
+                    <option value="MOD11_L2.A2015001.0535.005.2015005163452">MOD11_L2.A2015001.0535.005.2015005163452</option>
+                    <option value="MOD11_L2.A2015001.0530.005.2015005163337">MOD11_L2.A2015001.0530.005.2015005163337</option>
                 </select>
             </span></br>
             <span style="width:49%;"><input id="min" type="range"/><label for="min" id="min_label"></label></span>
