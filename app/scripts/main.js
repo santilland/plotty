@@ -27,7 +27,7 @@ var colorscale_id = false;
 //var farray = new Float32Array(width*height);
 
 
-var el = document.getElementById("canvas1");
+var el = document.getElementById("canvas");
 
 // Get sliders
 var min_range_slider = document.getElementById("min");
@@ -52,6 +52,22 @@ function showvalue (val) {
 }
 
 
+var colorscales = {
+	"rainbow": chroma.scale(
+		['#96005A', '#0000C8', '#0019FF', '#0098FF', '#2CFF96', '#97FF00', '#FFEA00', '#FF6F00', 'FF0000'], // colors
+		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
+	),
+	"jet": chroma.scale(
+		['#000083', '#003CAA', '#05FFFF', '#FFFF00', '#FA0000', '#800000'], // colors
+		[0, .125, 0.375, 0.625, 0.875, 1]  // positions
+	),
+	"viridis": chroma.scale(
+		['#440154', '#472b7a', '#3b518a', '#2c718e', '#218e8c', '#26ac81', '#59c764', '#a7db33', '#fde724'], // colors
+		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
+	)
+};
+
+
 function handleFileSelect(evt) {
 	var files = evt.target.files; // FileList object
 
@@ -61,7 +77,8 @@ function handleFileSelect(evt) {
   		var reader = new FileReader();
   		reader.onload = function (e) {
         	var data = new Uint16Array(e.target.result);
-        	plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
+        	//plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
+					plot.setData(data, 1354, 2040);
 			plot.render();
     	};
     	reader.onerror = function (e) {
@@ -82,7 +99,7 @@ var exampledata = new Float32Array(ex_height*ex_width);
 
 var xoff = ex_width / 3; // offsets to "center"
 var yoff = ex_height / 3;
-
+/*
 for (y = 0; y <= height; y++) {
 	for (x = 0; x <= width; x++) {
 		// calculate sine based on distance
@@ -94,10 +111,25 @@ for (y = 0; y <= height; y++) {
 		// save sine
 		exampledata[(y*ex_width)+x] = t;
 	}
-}
+}*/
 
-plot = new plotty.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
-plot.render();
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'data/FSL_2015051619.blob', true);
+xhr.responseType = 'arraybuffer';
+
+xhr.onload = function(e) {
+  var responseArray = new Uint16Array(this.response);
+	plot = new plotty2.plot(el, responseArray, 1354, 2040, document.getElementById("rainbow"), [11000, 13600]);
+	colorscaleselect.onchange();
+	plot.setClamp(false);
+	plot.render();
+};
+
+xhr.send();
+
+//plot = new plotty2.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
+//plot = new plotty2.plot(el, exampledata, ex_width, ex_height, document.getElementById("rainbow"), [11000, 13600]);
+//plot.render();
 
 
 /*for (var i=100; i>0; i--){
@@ -111,12 +143,10 @@ console.log("Render time: "+rendertime);*/
 
 min_range_slider.oninput=function(){
 	if(plot){
-		now = new Date().getTime();
 		min_range = parseFloat(this.value);
 		min_label.innerHTML = min_range;
-		if (now - lastupdate>20)
-			plot.updateDomain([min_range, max_range],3);
-		lastupdate = now;
+		plot.setDomain([min_range, max_range],3);
+		plot.render();
 	}
 };
 
@@ -124,40 +154,43 @@ min_range_slider.onchange=function(){
 	if(plot){
 		now = new Date().getTime();
 		min_range = parseFloat(this.value);
-		if (now - lastupdate>20)
-			plot.updateDomain([min_range, max_range]);
-		lastupdate = now;
+		plot.setDomain([min_range, max_range],3);
+		plot.render();
 	}
 };
 
 
 max_range_slider.oninput=function(){
 	if(plot){
-		now = new Date().getTime();
 		max_range = parseFloat(this.value);
 		max_label.innerHTML = max_range;
-		if (now - lastupdate>20)
-			plot.updateDomain([min_range, max_range],3);
-		lastupdate = now;
+		plot.setDomain([min_range, max_range],3);
+		plot.render();
 	}
 };
 
 max_range_slider.onchange=function(){
 	if(plot){
-		now = new Date().getTime();
 		max_range = parseFloat(this.value);
-		if (now - lastupdate>20)
-			plot.updateDomain([min_range, max_range]);
-		lastupdate = now;
+		plot.setDomain([min_range, max_range],3);
+		plot.render();
 	}
 };
 
 colorscaleselect.onchange=function(){
 	colorscale_id = this.value;
-	if(plot)
-		plot.updateScale(this.value);
+	if(plot) {
+		plot.setScale(colorscales[this.value]);
+		plot.render();
+
+		var myNode = document.getElementById("colorscale");
+		while (myNode.firstChild) {
+		  myNode.removeChild(myNode.firstChild);
+		}
+		var scaleImage = plot.getScaleImage();
+		scaleImage.style.width = "500px";
+		scaleImage.style.height = "20px";
+		document.body.appendChild(scaleImage);
+		myNode.appendChild(scaleImage);
+	}
 };
-
-
-
-
