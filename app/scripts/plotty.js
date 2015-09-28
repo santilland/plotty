@@ -20,29 +20,6 @@ function debounce(func, wait, immediate) {
 };
 
 
-
-/* helper function that could be maybe useful?*/
-function scaleImageData(imageData, scale) {
-    var scaled = ctx.createImageData(imageData.width * scale, imageData.height * scale);
-    var subLine = ctx.createImageData(scale, 1).data
-    for (var row = 0; row < imageData.height; row++) {
-        for (var col = 0; col < imageData.width; col++) {
-            var sourcePixel = imageData.data.subarray(
-                (row * imageData.width + col) * 4,
-                (row * imageData.width + col) * 4 + 4
-            );
-            for (var x = 0; x < scale; x++) subLine.set(sourcePixel, x*4)
-            for (var y = 0; y < scale; y++) {
-                var destRow = row * scale + y;
-                var destCol = col * scale;
-                scaled.data.set(subLine, (destRow * scaled.width + destCol) * 4)
-            }
-        }
-    }
-
-    return scaled;
-}
-
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
     var ratio_x = canvas.width/evt.target.offsetWidth;
@@ -52,7 +29,6 @@ function getMousePos(canvas, evt) {
       y: Math.round((evt.clientY - rect.top)*ratio_y)
     };
 }
-
 
 var plotty = new function() {
 
@@ -76,50 +52,58 @@ var plotty = new function() {
 	
     // Plot tool
     this.plot = function (domain, el, data, width, height, callback_value, scale_id) {
-       this.domain = domain;
-       this.data = data;
+      this.domain = domain;
+      this.data = data;
 
-       el.width = width;
-       el.height = height;
+      el.width = width;
+      el.height = height;
 
-       this.el = el;
+      this.el = el;
 
-       this.ctx = el.getContext("2d");
+      this.ctx = el.getContext("2d");
 
-       this.width = width;
-       this.height = height;
-       
-       if (!scale_id) scale_id="jet";
-       this.colorscale = colorscales[scale_id];
-       this.colorscale.domain(this.domain, 200);
-       this.imageData = null;
+      // TODO: Considering saving dimensions directly in object
+      // testing by overriding dimensions given, what is the best way
+      // to provide both functionalities?
+      this.width = width;
+      this.height = height;
+      if (!this.width || !this.height){
+        var l = this.data.length;
+        this.width = this.data[l-2];
+        this.height = this.data[l-1];
+      }
 
-       var self = this;
+      if (!scale_id) scale_id="jet";
+      this.colorscale = colorscales[scale_id];
+      this.colorscale.domain(this.domain);
+      this.imageData = null;
 
-       function mouseovervalue(e) {
-          var pos = getMousePos(self.el, e);
-          callback_value(self.data[(pos.y*this.width)+pos.x]);
-        }
-        this.el.addEventListener('mousemove', mouseovervalue, false);
+      var self = this;
+
+      function mouseovervalue(e) {
+        var pos = getMousePos(self.el, e);
+        callback_value(self.data[(pos.y*this.width)+pos.x]);
+      }
+      this.el.addEventListener('mousemove', mouseovervalue, false);
     };
 
     this.plot.prototype.updateDomain = function updateDomain(domain,subsample){
     	this.domain = domain;
-    	this.colorscale.domain(this.domain, 200);
+    	this.colorscale.domain(this.domain);
     	this.render(subsample);
     };
 
     this.plot.prototype.updateScale = function updateScale(scale){
     	if (colorscales[scale]){
     		this.colorscale = colorscales[scale];
-    		this.colorscale.domain(this.domain, 200);
+    		this.colorscale.domain(this.domain);
     		this.render();
     	}
     };
 
     this.plot.prototype.render = function render(subsample){
 
-    	var t0 = performance.now();
+    	//var t0 = performance.now();
 
       if (!subsample) {subsample=1;};
       var subset = subsample;
@@ -138,11 +122,8 @@ var plotty = new function() {
 
           var i = (((y*subset))*this.width)+((x)*subset);
 
-          // TODO: Think about this, when subsampling there is a displacement
-          // this helps reduce this but there is probably a better way
-          if(subset>1){
-            i = (((y*subset)+1)*this.width)+((x+1)*subset);
-          }
+          // TODO: When susbetting there is a slight shift of the image 
+          // there must be a good way for compensating this
 
           var index = ((y*w_sub)+x)*4;
 
@@ -163,16 +144,10 @@ var plotty = new function() {
         }
       }
 
-    var t1 = performance.now();
-    looptime+=(t1-t0);
+    this.ctx.putImageData(this.imageData, 0, 0); // at coords 0,0
 
-
-    console.log("Render took " + (t1 - t0) + " milliseconds.")
-
-		this.ctx.putImageData(this.imageData, 0, 0); // at coords 0,0
-    var t2 = performance.now();
-    rendertime+=(t2-t1);
-
+    //var t1 = performance.now();
+    //console.log("Render took " + (t1 - t0) + " milliseconds.")
 		
     };
 

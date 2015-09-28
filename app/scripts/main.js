@@ -1,10 +1,10 @@
 
 
-var width = 1354;
-var height = 2030;
+var width = 3670;
+var height = 637;
 
-var min_range = 11000;
-var max_range = 13600;
+var min_range = 220;
+var max_range = 290;
 
 /*var width = 361;
 var height = 180;
@@ -16,15 +16,9 @@ var lastupdate = new Date().getTime();
 var now = null;
 
 
-var rendertime = 0;
-var looptime = 0;
-
 var plot = false;
 
-var colorscale_id = false;
-
-
-//var farray = new Float32Array(width*height);
+var colorscale_id = "viridis";
 
 
 var el = document.getElementById("canvas1");
@@ -51,6 +45,18 @@ function showvalue (val) {
 	measurevalue.innerHTML = "Value: "+val;
 }
 
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.responseType = "arraybuffer";
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.response);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+
 
 function handleFileSelect(evt) {
 	var files = evt.target.files; // FileList object
@@ -60,8 +66,9 @@ function handleFileSelect(evt) {
 
   		var reader = new FileReader();
   		reader.onload = function (e) {
-        	var data = new Uint16Array(e.target.result);
-        	plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
+        	//var data = new Uint16Array(e.target.result);
+        	var data = new Float32Array(e.target.result);
+           	plot = new plotty.plot([min_range,max_range], el, data, false, false, showvalue, colorscale_id);
 			plot.render();
     	};
     	reader.onerror = function (e) {
@@ -73,6 +80,20 @@ function handleFileSelect(evt) {
 }
 
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+
+
+function handleProductSelect(evt) {
+	var request_url = "http://localhost:8080/ows?service=WPS&version=1.0.0&request=Execute&identifier=getArrayBuffer&DataInputs=coverage_id="+this.value+"&rawdataoutput=output";
+	httpGetAsync(request_url, function (response) {
+		var data = new Float32Array(response);
+        	plot = new plotty.plot([min_range,max_range], el, data, false, false, showvalue, colorscale_id);
+			plot.render();
+	});
+}
+
+document.getElementById('productselect').addEventListener('change', handleProductSelect, false);
+
 
 
 // Generate data
@@ -99,14 +120,6 @@ for (y = 0; y <= height; y++) {
 plot = new plotty.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
 plot.render();
 
-
-/*for (var i=100; i>0; i--){
-	min_range = (i/100)*80;
-	plot.updateDomain([min_range, max_range]);
-}
-
-console.log("Looptime: "+looptime);
-console.log("Render time: "+rendertime);*/
 
 
 min_range_slider.oninput=function(){
