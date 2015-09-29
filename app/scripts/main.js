@@ -23,6 +23,8 @@ var plot = false;
 
 var colorscale_id = false;
 
+var histogram_buckets = 50;
+
 
 //var farray = new Float32Array(width*height);
 
@@ -52,19 +54,35 @@ function showvalue (val) {
 }
 
 
+// var colorscales = {
+// 	"rainbow": chroma.scale(
+// 		['#96005A', '#0000C8', '#0019FF', '#0098FF', '#2CFF96', '#97FF00', '#FFEA00', '#FF6F00', 'FF0000'], // colors
+// 		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
+// 	),
+// 	"jet": chroma.scale(
+// 		['#000083', '#003CAA', '#05FFFF', '#FFFF00', '#FA0000', '#800000'], // colors
+// 		[0, .125, 0.375, 0.625, 0.875, 1]  // positions
+// 	),
+// 	"viridis": chroma.scale(
+// 		['#440154', '#472b7a', '#3b518a', '#2c718e', '#218e8c', '#26ac81', '#59c764', '#a7db33', '#fde724'], // colors
+// 		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
+// 	)
+// };
+
+
 var colorscales = {
-	"rainbow": chroma.scale(
-		['#96005A', '#0000C8', '#0019FF', '#0098FF', '#2CFF96', '#97FF00', '#FFEA00', '#FF6F00', 'FF0000'], // colors
-		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
-	),
-	"jet": chroma.scale(
-		['#000083', '#003CAA', '#05FFFF', '#FFFF00', '#FA0000', '#800000'], // colors
-		[0, .125, 0.375, 0.625, 0.875, 1]  // positions
-	),
-	"viridis": chroma.scale(
-		['#440154', '#472b7a', '#3b518a', '#2c718e', '#218e8c', '#26ac81', '#59c764', '#a7db33', '#fde724'], // colors
-		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
-	)
+	"rainbow": {
+		colors: ['#96005A', '#0000C8', '#0019FF', '#0098FF', '#2CFF96', '#97FF00', '#FFEA00', '#FF6F00', '#FF0000'],
+		positions: [0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]
+	},
+	"jet": {
+		colors: ['#000083', '#003CAA', '#05FFFF', '#FFFF00', '#FA0000', '#800000'],
+		positions: [0, .125, 0.375, 0.625, 0.875, 1]
+	},
+	"viridis": {
+		colors: ['#440154', '#472b7a', '#3b518a', '#2c718e', '#218e8c', '#26ac81', '#59c764', '#a7db33', '#fde724'],
+		positions: [0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]
+	}
 };
 
 
@@ -79,7 +97,9 @@ function handleFileSelect(evt) {
         	var data = new Uint16Array(e.target.result);
         	//plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
 					plot.setData(data, 1354, 2040);
-			plot.render();
+					plot.render();
+					drawHistogram(
+						calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
     	};
     	reader.onerror = function (e) {
         	console.error(e);
@@ -123,6 +143,8 @@ xhr.onload = function(e) {
 	colorscaleselect.onchange();
 	plot.setClamp(false);
 	plot.render();
+	drawHistogram(
+		calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
 };
 
 xhr.send();
@@ -141,12 +163,55 @@ console.log("Looptime: "+looptime);
 console.log("Render time: "+rendertime);*/
 
 
+function calculateHistogram(data, domain, bucketCount) {
+	var min = domain[0], max = domain[1];
+	var range = (max-min);
+	var histogram = new Array(bucketCount);
+	for (var i = 0; i < bucketCount; ++i) {
+		histogram[i] = 0;
+	}
+
+	for (var i = 0; i < data.length; ++i) {
+		var value = data[i];
+		if (value < min || value >= max)
+			continue;
+		var index = Math.round((value-min) / range * (bucketCount-1));
+		histogram[index] += 1;
+	}
+	drawHistogram(histogram);
+	return histogram;
+}
+
+function drawHistogram(histogram) {
+	var canvas = document.getElementById("histogram");
+	var ctx = canvas.getContext("2d");
+	var max = Math.max.apply(null, histogram);
+	var width = canvas.width;
+	var height = canvas.height;
+
+	ctx.clearRect(0, 0, width, height);
+
+	ctx.beginPath();
+	ctx.moveTo(0, histogram[0] / max * height);
+	histogram.forEach(function(value, index) {
+		var x = index / histogram.length * width;
+		var y = value / max * height;
+		ctx.lineTo(x, y);
+		ctx.stroke();
+	});
+	ctx.closePath();
+}
+
+
 min_range_slider.oninput=function(){
 	if(plot){
 		min_range = parseFloat(this.value);
 		min_label.innerHTML = min_range;
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
 	}
 };
 
@@ -156,6 +221,9 @@ min_range_slider.onchange=function(){
 		min_range = parseFloat(this.value);
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
 	}
 };
 
@@ -166,6 +234,9 @@ max_range_slider.oninput=function(){
 		max_label.innerHTML = max_range;
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
 	}
 };
 
@@ -174,13 +245,17 @@ max_range_slider.onchange=function(){
 		max_range = parseFloat(this.value);
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
 	}
 };
 
 colorscaleselect.onchange=function(){
 	colorscale_id = this.value;
 	if(plot) {
-		plot.setScale(colorscales[this.value]);
+		var scale = colorscales[this.value];
+		plot.setScale(scale.colors, scale.positions);
 		plot.render();
 
 		var myNode = document.getElementById("colorscale");

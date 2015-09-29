@@ -55,16 +55,16 @@ void main() {
     gl.shaderSource(vertexShader, vertexShaderSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-     throw new Error(gl.getShaderInfoLog(vertexShader));
-     return null;
+      throw new Error(gl.getShaderInfoLog(vertexShader));
+      return null;
     }
 
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentShaderSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-     throw new Error(gl.getShaderInfoLog(fragmentShader));
-     return null;
+      throw new Error(gl.getShaderInfoLog(fragmentShader));
+      return null;
     }
 
     var program = this.program = gl.createProgram();
@@ -80,12 +80,12 @@ void main() {
     this.texCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        0.0,  0.0,
-        1.0,  0.0,
-        0.0,  1.0,
-        0.0,  1.0,
-        1.0,  0.0,
-        1.0,  1.0]), gl.STATIC_DRAW);
+      0.0,  0.0,
+      1.0,  0.0,
+      0.0,  1.0,
+      0.0,  1.0,
+      1.0,  0.0,
+      1.0,  1.0]), gl.STATIC_DRAW);
     gl.enableVertexAttribArray(texCoordLocation);
     gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
@@ -116,22 +116,24 @@ void main() {
       gl.LUMINANCE, gl.FLOAT, new Float32Array(data));
   }
 
-  plot.prototype.setScale = function(scale) {
+  plot.prototype.setScale = function(colors, stops) {
     // scale must be a chroma-js scale
     var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext("2d")
+    var ctx = canvas.getContext("2d");
     canvas.width = 100;
     canvas.height = 1;
-    var data = ctx.createImageData(100, 1);
-    scale.domain([0, 1]);
-    for (var i = 0; i < 100; ++i) {
-      var c = scale(i/100).rgb();
-      data.data[i*4 + 0] = c[0];
-      data.data[i*4 + 1] = c[1];
-      data.data[i*4 + 2] = c[2];
-      data.data[i*4 + 3] = 255;
+
+    if (colors.length !== stops.length) {
+      throw new Error("Invalid color scale.");
     }
-    ctx.putImageData(data, 0, 0);
+
+    var gradient = ctx.createLinearGradient(0, 0, 100, 1);
+
+    for (var i = 0; i < colors.length; ++i) {
+      gradient.addColorStop(stops[i], colors[i]);
+    }
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 100, 1);
     this.setScaleImage(canvas);
   };
 
@@ -151,6 +153,10 @@ void main() {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scaleImage);
   };
 
+  plot.prototype.getData = function() {
+    return this.data;
+  };
+
   plot.prototype.getScaleImage = function() {
     return this.scaleImage;
   };
@@ -167,6 +173,10 @@ void main() {
     this.noDataValue = noDataValue;
   };
 
+  /*
+  The main rendering method. Renders the set data with the previously entered
+  values.
+  */
   plot.prototype.render = function() {
     var gl = this.gl;
     /*gl.canvas.width = this.width;
@@ -190,7 +200,7 @@ void main() {
 
     gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
     gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-    gl.uniform2f(domainLocation, this.domain[0], this.domain[1]);
+    gl.uniform2fv(domainLocation, this.domain);
     gl.uniform1i(clampLocation, this.clamp);
 
     var width = gl.canvas.width;
@@ -201,7 +211,6 @@ void main() {
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
     setRectangle(gl, 0, 0, width, height);
-
 
     // Draw the rectangle.
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -235,5 +244,5 @@ void main() {
     return context;
   }
 
-  return {plot:plot};
+  return {plot: plot};
 };
