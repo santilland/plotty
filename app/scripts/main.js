@@ -3,8 +3,19 @@
 var width = 1354;
 var height = 2030;
 
-var min_range = 220;
-var max_range = 300;
+// Placeholder just for testing purposes, there are multiple methods of getting the extent
+// of the data which does not necessarely need to be covered by the library itself
+var sizes = {
+	'FSL_2015051619.blob': {width:1354, height:2030},
+	'FSL_2015051634.blob': {width:1354, height:2030},
+	'LST_2015051637.blob': {width:1354, height:2030},
+	'LST_2015051638.blob': {width:1354, height:2030},
+	'LST_2015051822.blob': {width:1354, height:2030},
+	'LST_201505182256.blob': {width:1354, height:2030}
+};
+
+var min_range = 11000;
+var max_range = 13600;
 
 /*var width = 361;
 var height = 180;
@@ -22,6 +33,8 @@ var looptime = 0;
 var plot = false;
 
 var colorscale_id = false;
+
+var histogram_buckets = 50;
 
 
 //var farray = new Float32Array(width*height);
@@ -51,32 +64,7 @@ function showvalue (val) {
 	measurevalue.innerHTML = "Value: "+val;
 }
 
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.responseType = "arraybuffer";
-    xmlHttp.onreadystatechange = function() { 
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.response);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-    xmlHttp.send(null);
-}
 
-var colorscales = {
-	"rainbow": chroma.scale(
-		['#96005A', '#0000C8', '#0019FF', '#0098FF', '#2CFF96', '#97FF00', '#FFEA00', '#FF6F00', 'FF0000'], // colors
-		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
-	),
-	"jet": chroma.scale(
-		['#000083', '#003CAA', '#05FFFF', '#FFFF00', '#FA0000', '#800000'], // colors
-		[0, .125, 0.375, 0.625, 0.875, 1]  // positions
-	),
-	"viridis": chroma.scale(
-		['#440154', '#472b7a', '#3b518a', '#2c718e', '#218e8c', '#26ac81', '#59c764', '#a7db33', '#fde724'], // colors
-		[0, .125, .25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]  // positions
-	)
-};
 
 
 function handleFileSelect(evt) {
@@ -84,14 +72,15 @@ function handleFileSelect(evt) {
 
 	// Loop through the FileList and render image files as thumbnails.
 	for (var i = 0, f; f = files[i]; i++) {
-
-  		var reader = new FileReader();
+		var reader = new FileReader();
+  		reader.customsize = sizes[files[i].name];
   		reader.onload = function (e) {
         	var data = new Uint16Array(e.target.result);
-
         	//plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
-					plot.setData(data, 1354, 2040);
-			plot.render();
+					plot.setData(data, this.customsize.width, this.customsize.height);
+					plot.render();
+					drawHistogram(
+						calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
     	};
     	reader.onerror = function (e) {
         	console.error(e);
@@ -114,6 +103,8 @@ function handleProductSelect(evt) {
         	plot.setScale(colorscales["viridis"]);
 			plot.setClamp(true);
 			plot.render();
+			drawHistogram(
+						calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));
 
 	});
 }
@@ -143,17 +134,86 @@ for (y = 0; y <= height; y++) {
 	}
 }*/
 
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'data/FSL_2015051619.blob', true);
+xhr.responseType = 'arraybuffer';
+
+xhr.onload = function(e) {
+  var responseArray = new Uint16Array(this.response);
+	plot = new plotty.plot(el, responseArray, 1354, 2030, [11000, 13600], "viridis" );
+	colorscaleselect.onchange();
+	//plot.setClamp(false);
+	plot.render();
+	/*drawHistogram(
+		calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));*/
+};
+
+xhr.send();
+
+//plot = new plotty2.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
+//plot = new plotty2.plot(el, exampledata, ex_width, ex_height, document.getElementById("rainbow"), [11000, 13600]);
 //plot = new plotty.plot([-1,1], el, exampledata, ex_width, ex_height, showvalue, "viridis");
 //plot.render();
 
+
+/*for (var i=100; i>0; i--){
+	min_range = (i/100)*80;
+	plot.updateDomain([min_range, max_range]);
+}
+
+console.log("Looptime: "+looptime);
+console.log("Render time: "+rendertime);*/
+
+
+function calculateHistogram(data, domain, bucketCount) {
+	var min = domain[0], max = domain[1];
+	var range = (max-min);
+	var histogram = new Array(bucketCount);
+	for (var i = 0; i < bucketCount; ++i) {
+		histogram[i] = 0;
+	}
+
+	for (var i = 0; i < data.length; ++i) {
+		var value = data[i];
+		if (value < min || value >= max)
+			continue;
+		var index = Math.round((value-min) / range * (bucketCount-1));
+		histogram[index] += 1;
+	}
+	drawHistogram(histogram);
+	return histogram;
+}
+
+function drawHistogram(histogram) {
+	var canvas = document.getElementById("histogram");
+	var ctx = canvas.getContext("2d");
+	var max = Math.max.apply(null, histogram);
+	var width = canvas.width;
+	var height = canvas.height;
+
+	ctx.clearRect(0, 0, width, height);
+
+	ctx.beginPath();
+	ctx.moveTo(0, histogram[0] / max * height);
+	histogram.forEach(function(value, index) {
+		var x = index / histogram.length * width;
+		var y = value / max * height;
+		ctx.lineTo(x, y);
+		ctx.stroke();
+	});
+	ctx.closePath();
+}
 
 
 min_range_slider.oninput=function(){
 	if(plot){
 		min_range = parseFloat(this.value);
-		min_range.innerHTML = min_range;
+		min_label.innerHTML = min_range;
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		/*drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));*/
 	}
 };
 
@@ -163,39 +223,48 @@ min_range_slider.onchange=function(){
 		min_range = parseFloat(this.value);
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		/*drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));*/
 	}
 };
 
 
 max_range_slider.oninput=function(){
 	if(plot){
-		now = new Date().getTime();
 		max_range = parseFloat(this.value);
 		max_label.innerHTML = max_range;
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		/*drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));*/
 	}
 };
 
 max_range_slider.onchange=function(){
 	if(plot){
-		now = new Date().getTime();
 		max_range = parseFloat(this.value);
 		plot.setDomain([min_range, max_range],3);
 		plot.render();
+
+		/*drawHistogram(
+			calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));*/
 	}
 };
 
 colorscaleselect.onchange=function(){
 	colorscale_id = this.value;
 	if(plot) {
-		plot.setScale(colorscales[this.value]);
+		/*var scale = colorscales[this.value];
+		plot.setScale(scale.colors, scale.positions);
+		//plot.setScale(colorscales[this.value]);
 		plot.render();
 
 		var myNode = document.getElementById("colorscale");
 		while (myNode.firstChild) {
 		  myNode.removeChild(myNode.firstChild);
-		}
+		}*/
 		/*var scaleImage = plot.getScaleImage();
 		scaleImage.style.width = "500px";
 		scaleImage.style.height = "20px";
@@ -203,7 +272,3 @@ colorscaleselect.onchange=function(){
 		myNode.appendChild(scaleImage);*/
 	}
 };
-
-
-
-

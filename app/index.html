@@ -25,7 +25,7 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div> <h1>plotty.js</h1> </div>
-        <canvas id="canvas" style="max-width: 100%;"></canvas>
+        <canvas id="canvas" style="height: 90%; width: 50%;" width="500" height="500"></canvas>
         <!--<canvas id="canvas1" style="height: 500px; width: 500px;" width="500" height="500"></canvas>-->
         <div id="controls">
             <input type="file" id="files" name="files[]" multiple />
@@ -93,13 +93,12 @@
             <span style="width:49%;"><input id="max" type="range"/><label for="max" id="max_label"></label></span><br/>
             <span style="margin-top:3em;"><div id="measurevalue"></div></span>
             <div id="colorscale"></div>
+            <canvas id="histogram" width="500" height="100"></canvas>
         </div>
-        
 
 		<!-- build:js scripts/plotty.min.js -->
         <script src="components/chroma-js/chroma.min.js"></script>
-        
-		<script src="scripts/plotty2.js"></script>
+        <script src="scripts/plotty.js"></script>
         <!-- endbuild -->
 
 
