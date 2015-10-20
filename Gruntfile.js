@@ -264,6 +264,7 @@ module.exports = function (grunt) {
                         '.htaccess',
                         'images/{,*/}*.{webp,gif}',
                         'styles/fonts/{,*/}*.*',
+                        'scripts/main.js' // Copy main js without minfying as "radable example" 
                     ]
                 }]
             },
