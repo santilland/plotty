@@ -1,5 +1,6 @@
 
 
+
 var width = 500;
 var height = 500;
 
@@ -15,6 +16,8 @@ var histogram_buckets = 50;
 
 
 var el = document.getElementById("canvas");
+
+var colorscaleselect = document.getElementById("colorscaleselect");
 
 // Get sliders
 var min_range_slider = document.getElementById("min");
@@ -62,19 +65,14 @@ function handleFileSelect(evt) {
 	// Loop through the FileList and render image files as thumbnails.
 	for (var i = 0, f; f = files[i]; i++) {
 		var reader = new FileReader();
-  		//reader.customsize = sizes[files[i].name];
   		reader.onload = function (e) {
         	var data = new Uint16Array(e.target.result);
         	//plot = new plotty.plot(el, data, width, height, [min_range, max_range], "viridis" );
         	plot.setData(data, width, height);
         	plot.setDomain([min_range, max_range]);
 			plot.render();
-        	//plot = new plotty.plot([min_range,max_range], el, data, width, height, showvalue, colorscale_id);
-					/*plot.setData(data, width, height);
-					plot.setDomain([min_range, max_range]);
-					plot.render();*/
-					/*drawHistogram(
-						calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));*/
+			/*drawHistogram(
+				calculateHistogram(plot.getData(), [min_range, max_range], histogram_buckets));*/
     	};
     	reader.onerror = function (e) {
         	console.error(e);
@@ -110,7 +108,18 @@ for (y = 0; y <= height; y++) {
 
 
 
-plotty.addColorScale("test", ["#00ff00","#ff0000"], [0,1]);
+plotty.addColorScale("test", ["#00ff00","#0000ff","#ff0000"], [0,0.5,1]);
+
+
+for(var cm in plotty.colorscales){
+    var option = document.createElement("option");
+	option.text = cm;
+	option.value = cm;
+	if (cm == "viridis")
+		option.selected = true;
+	colorscaleselect.add(option);
+}
+
 
 
 plot = new plotty.plot(el, exampledata, width, height, [min_range, max_range], "viridis" );
@@ -233,3 +242,5 @@ colorscaleselect.onchange=function(){
 		plot.render();
 	}
 };
+
+
