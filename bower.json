@@ -2,9 +2,7 @@
   "name": "plotty",
   "version": "0.0.1-2",
   "dependencies": {},
-  "devDependencies":{
-  	"chroma-js": "~1.1.1"
-  },
+  "devDependencies":{},
   "ignore": [
     "**/.*",
     "app"
