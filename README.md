@@ -46,13 +46,50 @@ for (y = 0; y <= height; y++) {
 	}
 }
 
-plot = new plotty.plot([-1,1], el, exampledata, width, height, showvalue, "viridis");
+
+var el = document.getElementById("canvas");
+plot = new plotty.plot(el, exampledata, width, height, [-1, 1], "viridis" );
+//                    (canvas, data, width, height, [range], [colorscale])
 plot.render();
  ```
 
+There is a list of predefined colorscales:
+ * viridis
+ * inferno
+ * rainbow
+ * jet
+ * hsv
+ * hot
+ * cool
+ * spring
+ * summer
+ * autumn
+ * winter
+ * bone
+ * copper
+ * greys
+ * yignbu
+ * greens
+ * yiorrd
+ * bluered
+ * rdbu
+ * picnic
+ * portland
+ * blackbody
+ * earth
+ * electric
+ * magma
+ * plasma
 
-| Result renderings  |
-|:------------------:|
+ It is also possible to define your own colorscale by using
+ ```
+ plotty.addColorScale("mycolorscale", ["#00ff00","#0000ff","#ff0000"], [0,0.5,1]);
+ //                   (identifier   ,  color_steps,                  , percentage_steps) 
+ ```
+
+
+| Some example result renderings  |
+|:-------------------------------:|
 | ![Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10050683/dd814e46-621d-11e5-9b63-2d0d5b81e0bd.png) |
 | ![Second Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10069591/65034254-62ad-11e5-81e1-19a91ee46a5c.png) |
 
