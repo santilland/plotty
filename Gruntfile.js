@@ -372,7 +372,7 @@ module.exports = function (grunt) {
     grunt.registerTask('createrelease', [
         'clean:dist',
         'build',
-        'compress:release',
+        //'compress:release',
         'release'
     ]);
 

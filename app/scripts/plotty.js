@@ -420,6 +420,7 @@ plotty = new function() {
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2fv(domainLocation, this.domain);
       gl.uniform1i(clampLocation, this.clamp);
+      gl.uniform1f(noDataValueLocation, this.noDataValue);
 
       var positionBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -452,7 +453,7 @@ plotty = new function() {
 
           var index = ((y*w)+x)*4;
 
-          if(this.data[i]==0){
+          if(this.data[i]==this.noDataValue){
             this.imageData.data[index+0] = 0;
             this.imageData.data[index+1] = 0;
             this.imageData.data[index+2] = 0;
