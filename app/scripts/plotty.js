@@ -339,6 +339,33 @@ plotty = new function() {
     };
   };
 
+  var renderColorScaleToCanvas = function(colorscale, canvas){
+    var cs_def = this.colorscales[colorscale];
+    canvas.height = 1;
+    var canvas_ctx = canvas.getContext("2d");
+
+    if (Object.prototype.toString.call(cs_def) === "[object Object]") {
+      canvas.width = 100;
+      var gradient = canvas_ctx.createLinearGradient(0, 0, 100, 1);
+
+      for (var i = 0; i < cs_def.colors.length; ++i) {
+        gradient.addColorStop(cs_def.positions[i], cs_def.colors[i]);
+      }
+      canvas_ctx.fillStyle = gradient;
+      canvas_ctx.fillRect(0, 0, 100, 1);
+      
+    }
+    else if (Object.prototype.toString.call(cs_def) === "[object Uint8Array]") {
+      canvas.width = 256;
+      var imgData = canvas_ctx.createImageData(256,1);
+      imgData.data.set(cs_def);
+      canvas_ctx.putImageData(imgData,0,0);
+
+    }else{
+      throw new Error("Color scale not defined.");
+    }
+  }
+
   plot.prototype.setColorScale = function(colorscale) {
     
     this.colorscale = colorscale;
@@ -493,7 +520,10 @@ plotty = new function() {
   };
 
 
-  return {plot: plot, addColorScale: addColorScale, colorscales: colorscales};
+  return {
+    plot: plot, addColorScale: addColorScale, colorscales: colorscales,
+    renderColorScaleToCanvas: renderColorScaleToCanvas
+  };
 };
 
 
