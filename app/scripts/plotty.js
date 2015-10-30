@@ -197,17 +197,24 @@ plotty = new function() {
 	
   // plot constructor
   var plot = function (canvas, data, width, height, domain, colorscale, clamp, mouseover) {
+
+    this.datasetCollection = {};
     
     this.setCanvas(canvas);
+
+    // Apart from canvas all other options are optional to allow creating a base object
+    // to which multiple datasets can be added and rendered.
+    data = defaultFor(data, false);
 
     // TODO: Considering saving dimensions directly in object
     // testing by overriding dimensions given, what is the best way
     // to provide both functionalities?
-    var l = data.length;
-    canvas.width = defaultFor(width, data[l-2]);
-    canvas.height = defaultFor(height, data[l-2]);
-
-
+    if (data){
+      var l = data.length;
+      canvas.width = defaultFor(width, data[l-2]);
+      canvas.height = defaultFor(height, data[l-2]);
+    }
+    
     // Check if we can create webgl context and have supported float textures
     gl = this.gl = create3DContext(canvas);
     if(!gl)
@@ -221,7 +228,9 @@ plotty = new function() {
 
     this.setClamp(defaultFor(clamp, true));
 
-    this.setData(data,canvas.width, canvas.height);
+    if (data){
+      this.setData(data,canvas.width, canvas.height);
+    }
     
     if(gl){
 
@@ -309,11 +318,32 @@ plotty = new function() {
       );
 
     }
-
     this.data = data;
-    
+  };
 
+  plot.prototype.addDataset = function(id, data, width, height) {
     
+    if (this.gl){
+      var gl = this.gl;
+      gl.viewport(0, 0, width, height);
+      var textureData = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, textureData);
+
+      // Set the parameters so we can render any size image.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+      // Upload the image into the texture.
+      gl.texImage2D(gl.TEXTURE_2D, 0,
+        gl.LUMINANCE,
+        width, height, 0,
+        gl.LUMINANCE, gl.FLOAT, new Float32Array(data)
+      );
+      this.datasetCollection[id] = {textureData: textureData, width:width, height:height};
+    }
+
   };
 
   plot.prototype.getScaleImage = function() {
@@ -513,6 +543,54 @@ plotty = new function() {
 
     }
 	
+  };
+
+  plot.prototype.renderDataset = function (id){
+    var ds = this.datasetCollection[id];
+
+    var canvas = this.canvas;
+    canvas.width = ds.width;
+    canvas.height = ds.height;
+
+    if (this.gl){
+
+      var gl = this.gl;
+      gl.viewport(0, 0, ds.width, ds.height);
+      gl.useProgram(this.program);
+      // set the images
+      gl.uniform1i(gl.getUniformLocation(this.program, "u_textureData"), 0);
+      gl.uniform1i(gl.getUniformLocation(this.program, "u_textureScale"), 1);
+
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, ds.textureData);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, this.textureScale);
+
+      var positionLocation = gl.getAttribLocation(this.program, "a_position");
+      var domainLocation = gl.getUniformLocation(this.program, "u_domain");
+      var resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+      //var textureSizeLocation = gl.getUniformLocation(this.program, "u_textureSize");
+      var noDataValueLocation = gl.getUniformLocation(this.program, "u_noDataValue");
+      var clampLocation = gl.getUniformLocation(this.program, "u_clamp");
+
+      //gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
+      gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+      gl.uniform2fv(domainLocation, this.domain);
+      gl.uniform1i(clampLocation, this.clamp);
+      gl.uniform1f(noDataValueLocation, this.noDataValue);
+
+      var positionBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+      gl.enableVertexAttribArray(positionLocation);
+      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+      setRectangle(gl, 0, 0, canvas.width, canvas.height);
+
+      // Draw the rectangle.
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    }
+  
   };
 
   plot.prototype.getColor = function getColor(val){
