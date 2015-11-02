@@ -1,6 +1,6 @@
 {
   "name": "plotty",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dependencies": {},
   "devDependencies": {
     "grunt-contrib-compass": "^1.0.3",
