@@ -109,6 +109,12 @@ plotty = new function() {
       };
   }
 
+  function hasOwnProperty(obj, prop) {
+      var proto = obj.__proto__ || obj.constructor.prototype;
+      return (prop in obj) &&
+          (!(prop in proto) || proto[prop] !== obj[prop]);
+  }
+
   function defaultFor(arg, val) { return typeof arg !== 'undefined' ? arg : val; }
 
 
@@ -343,6 +349,24 @@ plotty = new function() {
       );
       this.datasetCollection[id] = {textureData: textureData, width:width, height:height};
     }
+
+  };
+
+  plot.prototype.removeDataset = function(id) {
+    
+    if (this.gl){
+      this.gl.deleteTexture(this.datasetCollection[id].textureData);
+      delete this.datasetCollection[id];
+    }
+
+  };
+
+  plot.prototype.datasetAvailable = function(id) {
+    
+    if (this.gl){
+      return hasOwnProperty(this.datasetCollection, id);
+    }
+    return false;
 
   };
 
