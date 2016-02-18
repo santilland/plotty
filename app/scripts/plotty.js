@@ -1,6 +1,6 @@
 
 
-plotty = new function() {
+plotty = (function() {
 
   // Colorscale definitions
   var colorscales = {
@@ -182,7 +182,8 @@ plotty = new function() {
     'uniform vec2 u_textureSize;\n'+
     'uniform vec2 u_domain;\n'+
     'uniform float u_noDataValue;\n'+
-    'uniform bool u_clamp;\n'+
+    'uniform bool u_clampLow;\n'+
+    'uniform bool u_clampHigh;\n'+
 
     '// the texCoords passed in from the vertex shader.\n'+
     'varying vec2 v_texCoord;\n'+
@@ -192,7 +193,7 @@ plotty = new function() {
       'float value = texture2D(u_textureData, v_texCoord)[0];\n'+
       'if (value == u_noDataValue)\n'+
         'gl_FragColor = vec4(0.0, 0, 0, 0.0);\n'+
-      'else if (!u_clamp && (value < u_domain[0] || value > u_domain[1]))\n'+
+      'else if ((!u_clampLow && value < u_domain[0]) || (!u_clampHigh && value > u_domain[1]))\n'+
         'gl_FragColor = vec4(0, 0, 0, 0);\n'+
       'else {\n'+
         'float normalisedValue = (value - u_domain[0]) / (u_domain[1] - u_domain[0]);\n'+
@@ -467,8 +468,9 @@ plotty = new function() {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, colorscaleImage);
   };
 
-  plot.prototype.setClamp = function(clamp) {
-    this.clamp = clamp;
+  plot.prototype.setClamp = function(clampLow, clampHigh) {
+    this.clampLow = clampLow;
+    this.clampHigh = (typeof clampHigh !== "undefined") ? clampHigh : clampLow;
   };
 
   plot.prototype.setNoDataValue = function(noDataValue) {
@@ -477,8 +479,7 @@ plotty = new function() {
 
   plot.prototype.render = function (){
     var canvas = this.canvas;
-    if (this.gl){
-
+    if (this.gl) {
       var gl = this.gl;
       gl.useProgram(this.program);
       // set the images
@@ -493,14 +494,14 @@ plotty = new function() {
       var positionLocation = gl.getAttribLocation(this.program, "a_position");
       var domainLocation = gl.getUniformLocation(this.program, "u_domain");
       var resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-      //var textureSizeLocation = gl.getUniformLocation(this.program, "u_textureSize");
       var noDataValueLocation = gl.getUniformLocation(this.program, "u_noDataValue");
-      var clampLocation = gl.getUniformLocation(this.program, "u_clamp");
+      var clampLowLocation = gl.getUniformLocation(this.program, "u_clampLow");
+      var clampHighLocation = gl.getUniformLocation(this.program, "u_clampHigh");
 
-      //gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
-      gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+      gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
       gl.uniform2fv(domainLocation, this.domain);
-      gl.uniform1i(clampLocation, this.clamp);
+      gl.uniform1i(clampLowLocation, this.clampLow);
+      gl.uniform1i(clampHighLocation, this.clampHigh);
       gl.uniform1f(noDataValueLocation, this.noDataValue);
 
       var positionBuffer = gl.createBuffer();
@@ -512,10 +513,8 @@ plotty = new function() {
 
       // Draw the rectangle.
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-    }else if (this.ctx){
-
-
+    }
+    else if (this.ctx) {
       var w = canvas.width;
       var h = canvas.height;
 
@@ -523,8 +522,8 @@ plotty = new function() {
 
       var trange = this.domain[1] - this.domain[0];
       var steps = this.colorscaleCanvas.width;
-      var csImageData = this.colorscaleCanvasCtx.getImageData(0,0, steps,1).data;
-      var outdomain = false;
+      var csImageData = this.colorscaleCanvasCtx.getImageData(0, 0, steps, 1).data;
+      var alpha;
 
       for (var y = 0; y < h; y++) {
         for (var x = 0; x < w; x++) {
@@ -534,37 +533,37 @@ plotty = new function() {
 
           var index = ((y*w)+x)*4;
 
-          if(this.data[i]==this.noDataValue){
+          if (this.data[i] == this.noDataValue) {
             this.imageData.data[index+0] = 0;
             this.imageData.data[index+1] = 0;
             this.imageData.data[index+2] = 0;
             this.imageData.data[index+3] = 0;
-          } else{
-            var c = Math.round(((this.data[i] - this.domain[0])/trange)*steps);
-            outdomain = false;
-            if (c<0){
-              c=0;
-              outdomain = true;
+          }
+          else {
+            var c = Math.round(((this.data[i] - this.domain[0]) / trange) * steps);
+            alpha = 255;
+            if (c < 0) {
+              c = 0;
+              if (!this.clampLow) {
+                alpha = 0;
+              }
             } 
-            if (c>255) {
-              c=255;
-              outdomain = true;
+            if (c > 255) {
+              c = 255;
+              if (!this.clampHigh) {
+                alpha = 0;
+              }
             }
 
             this.imageData.data[index+0] = csImageData[c*4];
             this.imageData.data[index+1] = csImageData[c*4+1];
             this.imageData.data[index+2] = csImageData[c*4+2];
-            if (outdomain && !this.clamp )
-              this.imageData.data[index+3] = 0;
-            else
-              this.imageData.data[index+3] = 255;
+            this.imageData.data[index+3] = alpha;
           }
-
         }
       }
 
       this.ctx.putImageData(this.imageData, 0, 0); // at coords 0,0
-
     }
 	
   };
@@ -595,12 +594,14 @@ plotty = new function() {
       var resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
       //var textureSizeLocation = gl.getUniformLocation(this.program, "u_textureSize");
       var noDataValueLocation = gl.getUniformLocation(this.program, "u_noDataValue");
-      var clampLocation = gl.getUniformLocation(this.program, "u_clamp");
+      var clampLowLocation = gl.getUniformLocation(this.program, "u_clampLow");
+      var clampHighLocation = gl.getUniformLocation(this.program, "u_clampHigh");
 
       //gl.uniform2f(textureSizeLocation, canvas.width, canvas.height);
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2fv(domainLocation, this.domain);
-      gl.uniform1i(clampLocation, this.clamp);
+      gl.uniform1i(clampLowLocation, this.clampLow);
+      gl.uniform1i(clampHighLocation, this.clampHigh);
       gl.uniform1f(noDataValueLocation, this.noDataValue);
 
       var positionBuffer = gl.createBuffer();
@@ -626,6 +627,4 @@ plotty = new function() {
     plot: plot, addColorScale: addColorScale, colorscales: colorscales,
     renderColorScaleToCanvas: renderColorScaleToCanvas
   };
-};
-
-
+})();

@@ -23,6 +23,9 @@ var colorscaleselect = document.getElementById("colorscaleselect");
 var min_range_slider = document.getElementById("min");
 var max_range_slider = document.getElementById("max");
 
+var clamp_low_check = document.getElementById("clamp_low");
+var clamp_high_check = document.getElementById("clamp_high");
+
 min_range_slider.max = max_range;
 min_range_slider.min = min_range;
 min_range_slider.value = min_range;
@@ -124,6 +127,7 @@ for(var cm in plotty.colorscales){
 
 
 plot = new plotty.plot(el, exampledata, width, height, [min_range, max_range], "viridis" );
+plot.setClamp(clamp_low_check.checked, clamp_high_check.checked);
 plot.render();
 
 
@@ -243,5 +247,12 @@ colorscaleselect.onchange=function(){
 		plot.render();
 	}
 };
+
+clamp_low_check.onchange = clamp_high_check.onchange = function() {
+    if(plot) {
+        plot.setClamp(clamp_low_check.checked, clamp_high_check.checked);
+        plot.render();
+    }
+}
 
 
