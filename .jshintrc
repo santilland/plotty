@@ -1,0 +1,20 @@
+{
+    "curly" : true,
+    "eqeqeq" : true,
+    "esnext": true,
+    "immed" : true,
+    "latedef" : true,
+    "newcap" : true,
+    "noarg" : true,
+    "sub" : true,
+    "undef" : true,
+    "boss" : true,
+    "eqnull" : true,
+    "browser" : true,
+    "browserify": true,
+    "globals" : {
+        "_" : true,
+        "module" : true,
+        "exports" : true
+    }
+}
