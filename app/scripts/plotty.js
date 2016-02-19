@@ -223,7 +223,7 @@ plotty = (function() {
     }
     
     // Check if we can create webgl context and have supported float textures
-    gl = this.gl = create3DContext(canvas);
+    var gl = this.gl = create3DContext(canvas);
     if(!gl)
       this.ctx = canvas.getContext("2d");
 
