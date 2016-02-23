@@ -198,35 +198,9 @@ var plotty = (function() {
     this.currentDataset = null;
     
     this.setCanvas(options.canvas);
-
-    if (options.colorScaleImage) {
-      this.setColorScaleImage(options.colorScaleImage);
-    }
-    else {
-      this.setColorScale(defaultFor(options.colorScale, 'viridis'));
-    }
-    this.setDomain(defaultFor(options.domain, [0, 1]));
-    this.setClamp(defaultFor(options.clampLow, true), options.clampHigh);
-
-    if (options.data) {
-      var l = options.data.length;
-      this.setData(
-        options.data,
-        defaultFor(options.width, options.data[l-2]),
-        defaultFor(options.height, options.data[l-2])
-      );
-    }
-
-    if (options.datasets) {
-      for (var i = 0; i < options.datasets.length; ++i) {
-        var ds = options.datasets[i];
-        this.addDataset(ds.id, ds.data, ds.width, ds.height);
-      }
-    }
-    
     // check if a webgl context is requested and available and set up the shaders
-    var gl = create3DContext(this.canvas);
-    if (defaultFor(options.useWebGL, true) && gl) {
+    var gl;
+    if (defaultFor(options.useWebGL, true) && (gl = create3DContext(this.canvas))) {
       this.gl = gl;
 
       // create the shader program
@@ -268,6 +242,31 @@ var plotty = (function() {
     }
     else {
       this.ctx = this.canvas.getContext("2d");
+    }
+
+    if (options.colorScaleImage) {
+      this.setColorScaleImage(options.colorScaleImage);
+    }
+    else {
+      this.setColorScale(defaultFor(options.colorScale, 'viridis'));
+    }
+    this.setDomain(defaultFor(options.domain, [0, 1]));
+    this.setClamp(defaultFor(options.clampLow, true), options.clampHigh);
+
+    if (options.data) {
+      var l = options.data.length;
+      this.setData(
+        options.data,
+        defaultFor(options.width, options.data[l-2]),
+        defaultFor(options.height, options.data[l-2])
+      );
+    }
+
+    if (options.datasets) {
+      for (var i = 0; i < options.datasets.length; ++i) {
+        var ds = options.datasets[i];
+        this.addDataset(ds.id, ds.data, ds.width, ds.height);
+      }
     }
   };
 
@@ -562,6 +561,9 @@ var plotty = (function() {
   plot.prototype.render = function() {
     var canvas = this.canvas;
     var dataset = this.currentDataset;
+
+    canvas.width = dataset.width;
+    canvas.height = dataset.height; 
     if (this.gl) {
       var gl = this.gl;
       gl.useProgram(this.program);
@@ -634,7 +636,7 @@ var plotty = (function() {
             }
           }
           
-          if (this.data[i] === this.noDataValue) {
+          if (data[i] === this.noDataValue) {
             alpha = 0;
           }
 
