@@ -95,7 +95,7 @@ There is a list of predefined colorscales:
 It is also possible to define your own colorscale using the `addColorScale` function.
 ```javascript
 plotty.addColorScale("mycolorscale", ["#00ff00", "#0000ff", "#ff0000"], [0, 0.5, 1]);
-//                  (identifier    ,  color_steps,                    , percentage_steps) 
+//                  ( identifier   ,  color_steps,                    , percentage_steps) 
 ```
 
 Examples
