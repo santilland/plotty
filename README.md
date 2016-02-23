@@ -3,9 +3,9 @@
 plotty
 ======
 
-Library for helping plot 2D data and provide colorscale functionality.
+plotty is a library for helping plot 2D data and provide color scaling
+functionality. Put your array data in it and receive a fresh image.
 
-Index file working locally can be found in `test` folder.
 
 Installation
 ------------
