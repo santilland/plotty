@@ -245,7 +245,7 @@ module.exports = function (grunt) {
         },
         jsdoc: {
             dist: {
-                src: ['README.md', 'package.json', '<%= yeoman.src %>/*.js'],
+                src: ['README.md', '<%= yeoman.src %>/*.js'],
                 options: {
                     destination: 'docs',
                     template: "node_modules/ink-docstrap/template",
