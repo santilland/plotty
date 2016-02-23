@@ -126,7 +126,11 @@ for(var cm in plotty.colorscales){
 
 
 
-plot = new plotty.plot(el, exampledata, width, height, [min_range, max_range], "viridis" );
+plot = new plotty.plot({
+	canvas: el, data: exampledata, width: width, height: height,
+	domain: [min_range, max_range], colorScale: "viridis",
+	//useWebGL: false
+});
 plot.setClamp(clamp_low_check.checked, clamp_high_check.checked);
 plot.render();
 
