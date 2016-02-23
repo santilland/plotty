@@ -1,4 +1,9 @@
-
+/**
+ * The main plotty module.
+ * @module plotty
+ * @name plotty
+ * @author: Daniel Santillan
+ */
 
 var plotty = (function() {
 
@@ -187,11 +192,30 @@ var plotty = (function() {
       '}\n'+
     '}';
 	
-	
+	/**
+   * @lends plotty
+   */
+
   /**
    * The raster plot class.
+   * @memberof module:plotty
    * @constructor
    * @param {Object} options the options to pass to the plot.
+   * @param {HTMLCanvasElement} [options.canvas] the canvas to render to
+   * @param {TypedArray} [options.data] the raster data to render
+   * @param {Number} [options.width] the width of the input raster
+   * @param {Number} [options.height] the height of the input raster
+   * @param {Object[]} [options.datasets] a list of named datasets. each must
+   *                                      have 'id', 'data', 'width' and 'height'.
+   * @param {(HTMLCanvasElement|HTMLImageElement)} [options.colorScaleImage] the color scale image to use
+   * @param {String} [options.colorScale] the name of a named color scale to use
+   * @param {Number[]} [options.domain] the value domain to scale the color
+   * @param {Boolean} [options.clampLow] whether or now values below the domain
+   *                                     shall be clamped
+   * @param {Boolean} [options.clampHigh] whether or now values above the domain
+   *                                      shall be clamped
+   * @param {Number} [options.noDataValue] the no-data value that shall always
+   *                                       hidden
    */
   var plot = function(options) {
     this.datasetCollection = {};
@@ -252,6 +276,7 @@ var plotty = (function() {
     }
     this.setDomain(defaultFor(options.domain, [0, 1]));
     this.setClamp(defaultFor(options.clampLow, true), options.clampHigh);
+    this.setNoDataValue(options.noDataValue);
 
     if (options.data) {
       var l = options.data.length;
@@ -442,6 +467,7 @@ var plotty = (function() {
 
   /**
    * Add a new colorscale to the list of available colorscales.
+   * @memberof module:plotty
    * @param {String} name the name of the newly defined color scale
    * @param {String[]} colors the array containing the colors. Each entry shall
    *                          adhere to the CSS color definitions.
@@ -459,6 +485,7 @@ var plotty = (function() {
 
   /**
    * Render the colorscale to the specified canvas.
+   * @memberof module:plotty
    * @param {String} name the name of the color scale to render
    * @param {HTMLCanvasElement} canvas the canvas to render to
    */

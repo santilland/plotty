@@ -16,6 +16,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-release');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
     grunt.initConfig({
         // configurable paths
@@ -79,7 +80,8 @@ module.exports = function (grunt) {
                     ]
                 }]
             },
-            server: '.tmp'
+            server: '.tmp',
+            docs: 'docs'
         },
         jshint: {
             options: {
@@ -240,8 +242,17 @@ module.exports = function (grunt) {
                     { expand: true, src: ['README.md'], dest: 'plotty' }
                 ]
             }
+        },
+        jsdoc: {
+            dist: {
+                src: ['README.md', 'package.json', '<%= yeoman.src %>/*.js'],
+                options: {
+                    destination: 'docs',
+                    template: "node_modules/ink-docstrap/template",
+                    configure: "jsdoc.json"
+                }
+            }
         }
-
     });
 
     grunt.registerTask('serve', function (target) {
@@ -274,12 +285,17 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
-
     grunt.registerTask('createrelease', [
         'clean:dist',
         'build',
+        'docs',
         //'compress:release',
         'release'
+    ]);
+
+    grunt.registerTask('docs', [
+        'clean:docs',
+        'jsdoc'
     ]);
 
     grunt.registerTask('default', [
