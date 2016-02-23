@@ -1,36 +1,46 @@
 [![Dependency Status](https://gemnasium.com/santilland/plotty.svg)](https://gemnasium.com/santilland/plotty)
 
 plotty
-===============
+======
 
-Library for helping plot 2D data and provide colorscale functionality.
+plotty is a library for helping plot 2D data and provide color scaling
+functionality. Put your array data in it and receive a fresh image.
 
-Index file working locally can be found in lib folder.
 
-Bower install
-```
+Installation
+------------
+
+Installation with Bower:
+```bash
 bower install --save santilland/plotty
 ```
 
-Just include script to site and add a canvas element where you want to render the data.
+Installation with npm:
+```bash
+npm install plotty --save
 ```
+
+Usage
+-----
+
+Just include script to site and add a canvas element where you want to render the data.
+```html
 <head>
-	<script src="lib/plotty.min.js"></script>
+	<script src="dist/plotty.min.js"></script>
 </head>
 <body>
-	<canvas id="canvas1" width=100 height=100></canvas>
+	<canvas id="canvas" width=100 height=100></canvas>
 </body>
 ```
 
-
- and render using different color scales 
- ```
- // Generate or load some data (Working with buffer arrays for now)
+and render using predefined settings:
+```
+// Generate or load some data (Working with buffer arrays for now)
 var width = 100;
 var height = 100;
-var exampledata = new Float32Array(height*width);
+var exampledata = new Float32Array(height * width);
 
-var xoff = width / 3; // offsets to "center"
+var xoff = width / 3;
 var yoff = height / 3;
 
 for (y = 0; y <= height; y++) {
@@ -46,12 +56,13 @@ for (y = 0; y <= height; y++) {
 	}
 }
 
-
-var el = document.getElementById("canvas");
-plot = new plotty.plot(el, exampledata, width, height, [-1, 1], "viridis" );
-//                    (canvas, data, width, height, [range], [colorscale])
+plot = new plotty.plot({
+	canvas: document.getElementById("canvas"),
+	data: exampledata, width: width, height: height,
+	domain: [-1, 1], colorScale: 'viridis'
+});
 plot.render();
- ```
+```
 
 There is a list of predefined colorscales:
  * viridis
@@ -81,23 +92,19 @@ There is a list of predefined colorscales:
  * magma
  * plasma
 
- It is also possible to define your own colorscale by using
- ```
- plotty.addColorScale("mycolorscale", ["#00ff00","#0000ff","#ff0000"], [0,0.5,1]);
- //                   (identifier   ,  color_steps,                  , percentage_steps) 
- ```
+It is also possible to define your own colorscale using the `addColorScale` function.
+```
+plotty.addColorScale("mycolorscale", ["#00ff00", "#0000ff", "#ff0000"], [0, 0.5, 1]);
+//                  (identifier    ,  color_steps,                    , percentage_steps) 
+```
 
+Examples
+--------
 
-| Some example result renderings  |
-|:-------------------------------:|
-| ![Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10050683/dd814e46-621d-11e5-9b63-2d0d5b81e0bd.png) |
-| ![Second Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10069591/65034254-62ad-11e5-81e1-19a91ee46a5c.png) |
+Generated data:
 
+![Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10050683/dd814e46-621d-11e5-9b63-2d0d5b81e0bd.png)
 
+Scientific data:
 
-
-
-
-
- 
-
+![Second Example plotty rendering](https://cloud.githubusercontent.com/assets/4036819/10069591/65034254-62ad-11e5-81e1-19a91ee46a5c.png)

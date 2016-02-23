@@ -1,0 +1,54 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>plotty.js</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <!-- build:css(.tmp) styles/main.css -->
+            <link rel="stylesheet" href="styles/main.css" />
+        <!-- endbuild -->
+
+        <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+
+    </head>
+    <body>
+        <!--[if lt IE 10]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <div> <h1>plotty.js</h1> </div>
+        <canvas id="canvas" style="height: 90%; width: 50%;" width="500" height="500"></canvas>
+        <!--<canvas id="canvas1" style="height: 500px; width: 500px;" width="500" height="500"></canvas>-->
+        <div id="controls">
+            <input type="file" id="files" name="files[]" multiple />
+            <output id="list"></output>
+            <span style="width:100%; margin-bottom: 2em;">
+                <select style="width:100%;" id="colorscaleselect">
+                </select>
+            </span></br>
+            <span style="width:49%;"><input id="min" type="range"/><label for="min" id="min_label"></label></span>
+            <span style="width:49%;"><input id="max" type="range"/><label for="max" id="max_label"></label></span><br/>
+            <span style="margin-top:3em;"><div id="measurevalue"></div></span>
+            <div id="colorscale" style="width:200px;height:20px;"></div>
+            <span style="width:49%;"><input id="clamp_low" type="checkbox"/><label for="min" id="min_label">Clamp Low</label></span>
+            <span style="width:49%;"><input id="clamp_high" type="checkbox"/><label for="min" id="min_label">Clamp High</label></span>
+            <canvas id="histogram" width="500" height="100"></canvas>
+        </div>
+
+		<!-- build:js scripts/plotty.min.js -->
+        <script src="plotty.js"></script>
+        <!-- endbuild -->
+        
+        <script src="scripts/main.js"></script>
+        
+
+
+
+</body>
+</html>
