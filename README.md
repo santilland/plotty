@@ -34,7 +34,7 @@ Just include script to site and add a canvas element where you want to render th
 ```
 
 and render using predefined settings:
-```
+```javascript
 // Generate or load some data (Working with buffer arrays for now)
 var width = 100;
 var height = 100;
@@ -93,7 +93,7 @@ There is a list of predefined colorscales:
  * plasma
 
 It is also possible to define your own colorscale using the `addColorScale` function.
-```
+```javascript
 plotty.addColorScale("mycolorscale", ["#00ff00", "#0000ff", "#ff0000"], [0, 0.5, 1]);
 //                  (identifier    ,  color_steps,                    , percentage_steps) 
 ```
