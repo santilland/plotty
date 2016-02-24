@@ -1,4 +1,3 @@
-[![Dependency Status](https://gemnasium.com/santilland/plotty.svg)](https://gemnasium.com/santilland/plotty)
 
 plotty
 ======
