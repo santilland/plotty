@@ -18,6 +18,9 @@ Installation with npm:
 ```bash
 npm install plotty --save
 ```
+Docs
+----
+http://santilland.github.io/plotty/
 
 Usage
 -----
