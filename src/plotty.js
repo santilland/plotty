@@ -495,14 +495,14 @@ var plotty = (function() {
     var canvas_ctx = canvas.getContext("2d");
 
     if (Object.prototype.toString.call(cs_def) === "[object Object]") {
-      canvas.width = 100;
-      var gradient = canvas_ctx.createLinearGradient(0, 0, 100, 1);
+      canvas.width = 256;
+      var gradient = canvas_ctx.createLinearGradient(0, 0, 256, 1);
 
       for (var i = 0; i < cs_def.colors.length; ++i) {
         gradient.addColorStop(cs_def.positions[i], cs_def.colors[i]);
       }
       canvas_ctx.fillStyle = gradient;
-      canvas_ctx.fillRect(0, 0, 100, 1);
+      canvas_ctx.fillRect(0, 0, 256, 1);
       
     }
     else if (Object.prototype.toString.call(cs_def) === "[object Uint8Array]") {
@@ -527,7 +527,7 @@ var plotty = (function() {
     if (!this.colorScaleCanvas) {
       // Create single canvas to render colorscales
       this.colorScaleCanvas = document.createElement('canvas');
-      this.colorScaleCanvas.width = 100;
+      this.colorScaleCanvas.width = 256;
       this.colorScaleCanvas.height = 1;  
     }
     renderColorScaleToCanvas(name, this.colorScaleCanvas);
