@@ -395,6 +395,7 @@ var plotty = (function() {
     if (this.currentDataset && this.currentDataset.id === null) {
       destroyDataset(this.gl, this.currentDataset);
     }
+    this.currentDataset = this.datasetCollection[id];
   };
 
   var destroyDataset = function(gl, dataset) {
@@ -590,9 +591,11 @@ var plotty = (function() {
     var dataset = this.currentDataset;
 
     canvas.width = dataset.width;
-    canvas.height = dataset.height; 
+    canvas.height = dataset.height;
+
     if (this.gl) {
       var gl = this.gl;
+      gl.viewport(0, 0, dataset.width, dataset.height);
       gl.useProgram(this.program);
       // set the images
       gl.uniform1i(gl.getUniformLocation(this.program, "u_textureData"), 0);
@@ -684,11 +687,7 @@ var plotty = (function() {
    * @param {string} id the identifier of the dataset to render.
    */
   plot.prototype.renderDataset = function(id) {
-    var dataset = this.datasetCollection[id];
-    if (!dataset) {
-      throw new Error("No such dataset '" + id + "'.");
-    }
-    this.setCurrentDataset(dataset);
+    this.setCurrentDataset(id);
     return this.render();
   };
 
