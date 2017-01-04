@@ -124,11 +124,13 @@ for(var cm in plotty.colorscales){
 	colorscaleselect.add(option);
 }
 
-this.matrix = [
+
+var matrix = [
     0.2, 0, 0,
     0, 0.6, 0,
     0, 0, 1
 ];
+
 plot = new plotty.plot({
 	canvas: el, data: exampledata, width: width, height: height,
 	domain: [min_range, max_range], colorScale: "viridis",
