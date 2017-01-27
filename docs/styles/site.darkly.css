@@ -4488,7 +4488,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   background-color: transparent;
 }
 .navbar-default .navbar-text {
-  color: #777;
+  color: #fff;
 }
 .navbar-default .navbar-nav > li > a {
   color: #fff;
@@ -6865,6 +6865,9 @@ textarea:focus {
   -webkit-box-shadow: none;
   box-shadow: none;
 }
+.form-control-feedback {
+  color: #464545;
+}
 .has-warning .help-block,
 .has-warning .control-label,
 .has-warning .radio,
@@ -7076,9 +7079,8 @@ footer {
   padding-top: 15px;
 }
 code {
-  background-color: none;
+  background-color: inherit;
   border: none;
-  color: orange;
 }
 .buffered-name {
   padding-top: 62px;
