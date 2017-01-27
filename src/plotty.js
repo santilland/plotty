@@ -146,12 +146,14 @@ var plotty = (function() {
   var vertexShaderSource = 
     'attribute vec2 a_position;\n'+
     'attribute vec2 a_texCoord;\n'+
-   
+    'uniform mat3 u_matrix;\n'+
     'uniform vec2 u_resolution;\n'+
     'varying vec2 v_texCoord;\n'+
     'void main() {\n'+
+      '// apply transformation matrix\n'+
+      'vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n' +
       '// convert the rectangle from pixels to 0.0 to 1.0\n'+
-      'vec2 zeroToOne = a_position / u_resolution;\n'+
+      'vec2 zeroToOne = position / u_resolution;\n'+
       '// convert from 0->1 to 0->2\n'+
       'vec2 zeroToTwo = zeroToOne * 2.0;\n'+
       '// convert from 0->2 to -1->+1 (clipspace)\n'+
@@ -166,7 +168,6 @@ var plotty = (function() {
   // Definition of fragment shader
   var fragmentShaderSource = 
     'precision mediump float;\n'+
-
     '// our textur\n'+
     'uniform sampler2D u_textureData;\n'+
     'uniform sampler2D u_textureScale;\n'+
@@ -216,6 +217,9 @@ var plotty = (function() {
    *                                      shall be clamped
    * @param {Number} [options.noDataValue] the no-data value that shall always
    *                                       hidden
+   *
+   * @param {Array} [options.matrix] Transformation matrix
+   *
    */
   var plot = function(options) {
     this.datasetCollection = {};
@@ -292,6 +296,16 @@ var plotty = (function() {
         var ds = options.datasets[i];
         this.addDataset(ds.id, ds.data, ds.width, ds.height);
       }
+    }
+
+    if (options.matrix) {
+      this.matrix = options.matrix
+    } else {  // if no matrix is provided, supply identity matrix
+      this.matrix = [
+          1, 0, 0,
+          0, 1, 0,
+          0, 0, 1
+      ];
     }
   };
 
@@ -612,17 +626,20 @@ var plotty = (function() {
       var noDataValueLocation = gl.getUniformLocation(this.program, "u_noDataValue");
       var clampLowLocation = gl.getUniformLocation(this.program, "u_clampLow");
       var clampHighLocation = gl.getUniformLocation(this.program, "u_clampHigh");
+      var matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
 
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2fv(domainLocation, this.domain);
       gl.uniform1i(clampLowLocation, this.clampLow);
       gl.uniform1i(clampHighLocation, this.clampHigh);
       gl.uniform1f(noDataValueLocation, this.noDataValue);
+      gl.uniformMatrix3fv(matrixLocation, false, this.matrix);
 
       var positionBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.enableVertexAttribArray(positionLocation);
       gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
 
       setRectangle(gl, 0, 0, canvas.width, canvas.height);
 
