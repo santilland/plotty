@@ -45,16 +45,18 @@
 			</li>
 			
 		</ul>
-		<div class="col-sm-3 col-md-3">
-            <form class="navbar-form" role="search">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                    <div class="input-group-btn">
-                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
                     </div>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
+        
 	</div>
 
 </div>
@@ -98,10 +100,10 @@ functionality. Put your array data in it and receive a fresh image.</p>
 <pre class="prettyprint source lang-bash"><code>npm install plotty --save</code></pre><h2>Docs</h2><p>http://santilland.github.io/plotty/</p>
 <h2>Usage</h2><p>Just include script to site and add a canvas element where you want to render the data.</p>
 <pre class="prettyprint source lang-html"><code>&lt;head>
-    &lt;script src=&quot;dist/plotty.min.js&quot;>&lt;/script>
+  &lt;script src=&quot;dist/plotty.min.js&quot;>&lt;/script>
 &lt;/head>
 &lt;body>
-    &lt;canvas id=&quot;canvas&quot; width=100 height=100>&lt;/canvas>
+  &lt;canvas id=&quot;canvas&quot; width=100 height=100>&lt;/canvas>
 &lt;/body></code></pre><p>and render using predefined settings:</p>
 <pre class="prettyprint source lang-javascript"><code>// Generate or load some data (Working with buffer arrays for now)
 var width = 100;
@@ -112,22 +114,22 @@ var xoff = width / 3;
 var yoff = height / 3;
 
 for (y = 0; y &lt;= height; y++) {
-    for (x = 0; x &lt;= width; x++) {
-        // calculate sine based on distance
-        x2 = x - xoff;
-        y2 = y - yoff;
-        d = Math.sqrt(x2*x2 + y2*y2);
-        t = Math.sin(d/6.0);
+  for (x = 0; x &lt;= width; x++) {
+    // calculate sine based on distance
+    x2 = x - xoff;
+    y2 = y - yoff;
+    d = Math.sqrt(x2*x2 + y2*y2);
+    t = Math.sin(d/6.0);
 
-        // save sine
-        exampledata[(y*width)+x] = t;
-    }
+    // save sine
+    exampledata[(y*width)+x] = t;
+  }
 }
 
 plot = new plotty.plot({
-    canvas: document.getElementById(&quot;canvas&quot;),
-    data: exampledata, width: width, height: height,
-    domain: [-1, 1], colorScale: 'viridis'
+  canvas: document.getElementById(&quot;canvas&quot;),
+  data: exampledata, width: width, height: height,
+  domain: [-1, 1], colorScale: 'viridis'
 });
 plot.render();</code></pre><p>There is a list of predefined colorscales:</p>
 <table>
@@ -187,7 +189,14 @@ plot.render();</code></pre><p>There is a list of predefined colorscales:</p>
 </table>
 <p>It is also possible to define your own colorscale using the <code>addColorScale</code> function.</p>
 <pre class="prettyprint source lang-javascript"><code>plotty.addColorScale(&quot;mycolorscale&quot;, [&quot;#00ff00&quot;, &quot;#0000ff&quot;, &quot;#ff0000&quot;], [0, 0.5, 1]);
-//                  ( identifier   ,  color_steps,                    , percentage_steps)</code></pre><h2>Examples</h2><p>Generated data:</p>
+//                  ( identifier   ,  color_steps,                    , percentage_steps)</code></pre><h2>Development</h2><p>The following <code>npm</code> commands are provided to help with the development:</p>
+<ul>
+<li><code>npm run build</code>: Build a non-minified version of plotty.</li>
+<li><code>npm run build-min</code>: Build a minified version of plotty.</li>
+<li><code>npm run watch</code>: Start a watcher that continuously builds plotty upon changes.</li>
+<li><code>npm start</code>: Start a development server.</li>
+</ul>
+<h2>Examples</h2><p>Generated data:</p>
 <p><img src="https://cloud.githubusercontent.com/assets/4036819/10050683/dd814e46-621d-11e5-9b63-2d0d5b81e0bd.png" alt="Example plotty rendering"></p>
 <p>Scientific data:</p>
 <p><img src="https://cloud.githubusercontent.com/assets/4036819/10069591/65034254-62ad-11e5-81e1-19a91ee46a5c.png" alt="Second Example plotty rendering"></p></article>
@@ -213,28 +222,30 @@ plot.render();</code></pre><p>There is a list of predefined colorscales:</p>
 </div>
 </div>
 
-<div class="modal fade" id="searchResults">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Search results</h4>
-      </div>
-      <div class="modal-body"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
 
 <footer>
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
 	
-		on 2017-01-27T16:16:25+01:00
+		on 2017-05-18T10:15:38+02:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
@@ -242,7 +253,9 @@ plot.render();</code></pre><p>There is a list of predefined colorscales:</p>
 
 <script src="scripts/docstrap.lib.js"></script>
 <script src="scripts/toc.js"></script>
-<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
 
 <script>
 $( function () {
@@ -252,7 +265,7 @@ $( function () {
 		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
 	} );
 
-	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
 		var $this = $( this );
 
 		var example = $this.find( "code" );
@@ -288,8 +301,7 @@ $( function () {
 	} );
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			var id = $( heading ).attr( "id" );
-			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+			return $( heading ).attr( "id" ) || ( prefix + i );
 		},
 		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
 		showAndHide : false,
@@ -315,11 +327,13 @@ $( function () {
 <!--Google Analytics-->
 
 
-<script type="text/javascript">
-	$(document).ready(function() {
-		SearcherDisplay.init();
-	});
-</script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
 
 </body>
 </html>
