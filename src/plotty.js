@@ -636,4 +636,4 @@ class plot {
 }
 
 // register the symbols to be exported at the 'global' object (to be replaced by browserify)
-global.plotty = { plot, addColorScale, colorscales, renderColorScaleToCanvas };
+export { plot, addColorScale, colorscales, renderColorScaleToCanvas };
