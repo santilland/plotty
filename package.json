@@ -30,8 +30,9 @@
   "scripts": {
     "build-min": "browserify -t babelify -g uglifyify src/plotty.js -o dist/plotty.min.js --standalone window",
     "build": "browserify -t babelify src/plotty.js -o dist/plotty.js --standalone window",
+    "make-parser": "pegjs -o src/arithmetics-parser.js src/arithmetics.pegjs",
     "watch": "watchify -d -t babelify src/plotty.js -o dist/plotty.js -v --standalone window",
-    "start": "budo src/plotty.js:plotty.js -l -d test/ -d dist/ -o -- -t babelify --standalone window",
+    "start": "budo src/plotty.js:plotty.js -l -d test/ -d dist/ -o --static-options [ --cache-control false ] -- -t babelify --standalone window",
     "jsdoc": "rm -rf docs/*; jsdoc -r src README.md -d docs -t node_modules/ink-docstrap/template -c jsdoc.json",
     "prepublish": "npm run build && npm run build-min"
   }
