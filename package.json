@@ -1,7 +1,7 @@
 {
   "name": "plotty",
   "license": "MIT",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.1.5",
