@@ -9,8 +9,8 @@
     "babel-eslint": "^10.0.1",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
-    "budo": "^11.5.0",
-    "eslint": "^5.9.0",
+    "budo": "^11.6.2",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
@@ -19,7 +19,7 @@
     "jsdoc": "^3.4.3",
     "pegjs": "^0.10.0",
     "uglifyify": "^5.0.1",
-    "watchify": "^3.9.0"
+    "watchify": "^3.11.1"
   },
   "engines": {
     "node": ">=0.8.0"
@@ -30,7 +30,9 @@
     "url": "git://github.com/santilland/plotty.git"
   },
   "browserify": {
-    "transform": ["babelify"]
+    "transform": [
+      "babelify"
+    ]
   },
   "scripts": {
     "build-min": "browserify -t [ babelify --presets [ @babel/preset-env ] ] -g uglifyify src/plotty.js -o dist/plotty.min.js --standalone plotty",
