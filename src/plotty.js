@@ -9,6 +9,7 @@
  * @constant
  */
 import { colorscales } from './colorscales';
+import { parse as parseArithmetics } from './arithmetics-parser';
 
 function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
@@ -171,7 +172,7 @@ void main() {
 // Definition of fragment shader
 const fragmentShaderSource = `
 precision mediump float;
-// our textur
+// our texture
 uniform sampler2D u_textureData;
 uniform sampler2D u_textureScale;
 uniform vec2 u_textureSize;
@@ -504,26 +505,139 @@ class plot {
     canvas.width = dataset.width;
     canvas.height = dataset.height;
 
+    let ids = null;
+    if (this.expressionAst) {
+      const idsSet = new Set([]);
+      const getIds = (node) => {
+        if (typeof node === 'string') {
+          // ids should not contain unary operators
+          idsSet.add(node.replace(new RegExp(/[+-]/, 'g'), ''));
+        }
+        if (typeof node.lhs === 'string') {
+          idsSet.add(node.lhs.replace(new RegExp(/[+-]/, 'g'), ''));
+        } else if (typeof node.lhs === 'object') {
+          getIds(node.lhs);
+        }
+        if (typeof node.rhs === 'string') {
+          idsSet.add(node.rhs.replace(new RegExp(/[+-]/, 'g'), ''));
+        } else if (typeof node.rhs === 'object') {
+          getIds(node.rhs);
+        }
+      };
+      getIds(this.expressionAst);
+      ids = Array.from(idsSet);
+    }
+
+    let program = null;
+
     if (this.gl) {
       const gl = this.gl;
       gl.viewport(0, 0, dataset.width, dataset.height);
-      gl.useProgram(this.program);
-      // set the images
-      gl.uniform1i(gl.getUniformLocation(this.program, 'u_textureData'), 0);
-      gl.uniform1i(gl.getUniformLocation(this.program, 'u_textureScale'), 1);
 
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, dataset.textureData);
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, this.textureScale);
+      if (this.expressionAst) {
+        const vertexShaderSourceExpressionTemplate = `
+        attribute vec2 a_position;
+        attribute vec2 a_texCoord;
+        uniform mat3 u_matrix;
+        uniform vec2 u_resolution;
+        varying vec2 v_texCoord;
+        void main() {
+          // apply transformation matrix
+          vec2 position = (u_matrix * vec3(a_position, 1)).xy;
+          // convert the rectangle from pixels to 0.0 to 1.0
+          vec2 zeroToOne = position / u_resolution;
+          // convert from 0->1 to 0->2
+          vec2 zeroToTwo = zeroToOne * 2.0;
+          // convert from 0->2 to -1->+1 (clipspace)
+          vec2 clipSpace = zeroToTwo - 1.0;
+          gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+          // pass the texCoord to the fragment shader
+          // The GPU will interpolate this value between points.
+          v_texCoord = a_texCoord;
+        }`;
+        const expressionReducer = (node) => {
+          if (typeof node === 'object') {
+            if (node.op === '**') {
+              // math power operator substitution
+              return `pow(${expressionReducer(node.lhs)}, ${expressionReducer(node.rhs)})`;
+            }
+            if (node.fn) {
+              return `(${node.fn}(${expressionReducer(node.lhs)}))`;
+            }
+            return `(${expressionReducer(node.lhs)} ${node.op} ${expressionReducer(node.rhs)})`;
+          } else if (typeof node === 'string') {
+            return `${node}_value`;
+          }
+          return `float(${node})`;
+        };
 
-      const positionLocation = gl.getAttribLocation(this.program, 'a_position');
-      const domainLocation = gl.getUniformLocation(this.program, 'u_domain');
-      const resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
-      const noDataValueLocation = gl.getUniformLocation(this.program, 'u_noDataValue');
-      const clampLowLocation = gl.getUniformLocation(this.program, 'u_clampLow');
-      const clampHighLocation = gl.getUniformLocation(this.program, 'u_clampHigh');
-      const matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
+        const compiledExpression = expressionReducer(this.expressionAst);
+
+        // Definition of fragment shader
+        const fragmentShaderSourceExpressionTemplate = `
+        precision mediump float;
+        // our texture
+        uniform sampler2D u_textureScale;
+
+        // add all required textures
+${ids.map(id => `        uniform sampler2D u_texture_${id};`).join('\n')}
+
+        uniform vec2 u_textureSize;
+        uniform vec2 u_domain;
+        uniform float u_noDataValue;
+        uniform bool u_clampLow;
+        uniform bool u_clampHigh;
+        // the texCoords passed in from the vertex shader.
+        varying vec2 v_texCoord;
+        void main() {
+${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texCoord)[0];`).join('\n')}
+          float value = ${compiledExpression};
+
+          if (value == u_noDataValue)
+            gl_FragColor = vec4(0.0, 0, 0, 0.0);
+          else if ((!u_clampLow && value < u_domain[0]) || (!u_clampHigh && value > u_domain[1]))
+            gl_FragColor = vec4(0, 0, 0, 0);
+          else {
+            float normalisedValue = (value - u_domain[0]) / (u_domain[1] - u_domain[0]);
+            gl_FragColor = texture2D(u_textureScale, vec2(normalisedValue, 0));
+          }
+        }`;
+        program = createProgram(gl, vertexShaderSource, fragmentShaderSourceExpressionTemplate);
+        gl.useProgram(program);
+
+        gl.uniform1i(gl.getUniformLocation(program, 'u_textureScale'), 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.textureScale);
+        for (let i = 0; i < ids.length; ++i) {
+          const location = i + 1;
+          const id = ids[i];
+          const ds = this.datasetCollection[id];
+          if (!ds) {
+            throw new Error(`No such dataset registered: '${id}'`);
+          }
+          gl.uniform1i(gl.getUniformLocation(program, `u_texture_${id}`), location);
+          gl.activeTexture(gl[`TEXTURE${location}`]);
+          gl.bindTexture(gl.TEXTURE_2D, ds.textureData);
+        }
+      } else {
+        program = this.program;
+        gl.useProgram(program);
+        // set the images
+        gl.uniform1i(gl.getUniformLocation(program, 'u_textureData'), 0);
+        gl.uniform1i(gl.getUniformLocation(program, 'u_textureScale'), 1);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, dataset.textureData);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.textureScale);
+      }
+      const positionLocation = gl.getAttribLocation(program, 'a_position');
+      const domainLocation = gl.getUniformLocation(program, 'u_domain');
+      const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+      const noDataValueLocation = gl.getUniformLocation(program, 'u_noDataValue');
+      const clampLowLocation = gl.getUniformLocation(program, 'u_clampLow');
+      const clampHighLocation = gl.getUniformLocation(program, 'u_clampHigh');
+      const matrixLocation = gl.getUniformLocation(program, 'u_matrix');
 
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2fv(domainLocation, this.domain);
@@ -536,7 +650,6 @@ class plot {
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.enableVertexAttribArray(positionLocation);
       gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
 
       setRectangle(gl, 0, 0, canvas.width, canvas.height);
 
@@ -561,8 +674,6 @@ class plot {
           const i = (y * w) + x;
           // TODO: Possible increase of performance through use of worker threads?
 
-          const index = ((y * w) + x) * 4;
-
           let c = Math.round(((data[i] - this.domain[0]) / trange) * steps);
           alpha = 255;
           if (c < 0) {
@@ -581,6 +692,7 @@ class plot {
             alpha = 0;
           }
 
+          const index = ((y * w) + x) * 4;
           imageData.data[index + 0] = csImageData[c * 4];
           imageData.data[index + 1] = csImageData[(c * 4) + 1];
           imageData.data[index + 2] = csImageData[(c * 4) + 2];
@@ -632,6 +744,19 @@ class plot {
       csImageData[(c * 4) + 2],
       alpha,
     ];
+  }
+  /**
+   * Sets a mathematical expression to be evaluated on the plot. Expression can contain mathematical operations with integer/float values, dataset identifiers or GLSL supported functions with a single parameter.
+   * Supported mathematical operations are: add '+', subtract '-', multiply '*', divide '/', power '**', unary plus '+a', unary minus '-a'.
+   * Useful GLSL functions are for example: radians, degrees, sin, asin, cos, acos, tan, atan, log2, log, sqrt, exp2, exp, abs, sign, floor, ceil, fract.
+   * @param {string} expression Mathematical expression. Example: '-2 * sin(3.1415 - dataset1) ** 2'
+   */
+  setExpression(expression) {
+    if (!expression || !expression.length) {
+      this.expressionAst = null;
+    } else {
+      this.expressionAst = parseArithmetics(expression);
+    }
   }
 }
 
