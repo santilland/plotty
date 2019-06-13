@@ -85,6 +85,7 @@ document.getElementById('files').addEventListener('change', handleFileSelect, fa
 
 // Generate data
 var exampledata = new Float32Array(height*width);
+var exampledata_new = new Float32Array(height*width);
 
 var xoff = width / 3; // offsets to "center"
 var yoff = height / 3;
@@ -97,9 +98,10 @@ for (var y = 0; y <= height; y++) {
         var y2 = y - yoff;
         var d = Math.sqrt(x2*x2 + y2*y2);
         var t = Math.sin(d/6.0);
-
         // save sine
         exampledata[(y*width)+x] = t*100;
+        var t2 = Math.cos(d/6.0);
+        exampledata_new[(y*width)+x] = t2*100;
     }
 }
 
@@ -125,13 +127,17 @@ var matrix = [
 ];
 
 plot = new plotty.plot({
-    canvas: el, data: exampledata, width: width, height: height,
+    canvas: el, width: width, height: height,
     domain: [min_range, max_range], colorScale: "viridis",
     //useWebGL: false
     //matrix : matrix
 });
-
 plot.setClamp(clamp_low_check.checked, clamp_high_check.checked);
+
+plot.addDataset('dataset1', exampledata, width, height);
+// plot.addDataset('dataset2', exampledata_new, width, height);
+
+// plot.setExpression('(1.2 ** -3) * abs(dataset1 * 2 + 0.1 * dataset2)');
 plot.render();
 
 
