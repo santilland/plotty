@@ -200,24 +200,26 @@ void main() {
  * @memberof module:plotty
  * @constructor
  * @param {Object} options the options to pass to the plot.
- * @param {HTMLCanvasElement} [options.canvas] the canvas to render to
+ * @param {HTMLCanvasElement} [options.canvas=document.createElement('canvas')]
+ *        the canvas to render to
  * @param {TypedArray} [options.data] the raster data to render
  * @param {Number} [options.width] the width of the input raster
  * @param {Number} [options.height] the height of the input raster
- * @param {Object[]} [options.datasets] a list of named datasets. each must
- *                                      have 'id', 'data', 'width' and 'height'.
- * @param {(HTMLCanvasElement|HTMLImageElement)} [options.colorScaleImage] the color scale
- *                                                                         image to use
+ * @param {Object[]} [options.datasets=undefined] a list of named datasets. each
+ *         must have 'id', 'data', 'width' and 'height'.
+ * @param {(HTMLCanvasElement|HTMLImageElement)} [options.colorScaleImage=undefined]
+ *        the color scale image to use
  * @param {String} [options.colorScale] the name of a named color scale to use
- * @param {Number[]} [options.domain] the value domain to scale the color
- * @param {Boolean} [options.clampLow] whether or now values below the domain
- *                                     shall be clamped
- * @param {Boolean} [options.clampHigh] whether or now values above the domain
- *                                      shall be clamped
- * @param {Number} [options.noDataValue] the no-data value that shall always
- *                                       hidden
- *
- * @param {Array} [options.matrix] Transformation matrix
+ * @param {Number[]} [options.domain=[0, 1]] the value domain to scale the color
+ * @param {Boolean} [options.clampLow=true] whether or now values below the domain
+ *        shall be clamped
+ * @param {Boolean} [options.clampHigh=clampLow] whether or now values above the
+ * domain shall be clamped (if not defined defaults to clampLow value)
+ * @param {Number} [options.noDataValue = undefined] the no-data value that shall
+ *         always be hidden
+ * @param {Array} [options.matrix=[1, 0, 0, 0, 1, 0, 0, 0, 1 ]] Transformation matrix
+ * @param {Boolean} [options.useWebGL=true] plotty can also function with pure javascript
+ *         but it is much slower then using WebGl rendering
  *
  */
 class plot {

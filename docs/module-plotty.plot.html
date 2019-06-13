@@ -169,6 +169,8 @@
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -205,6 +207,12 @@
             
 
             
+                <td class="default">
+                
+                    document.createElement('canvas')
+                
+                </td>
+            
 
             <td class="description last">the canvas to render to</td>
         </tr>
@@ -238,6 +246,10 @@
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">the raster data to render</td>
@@ -273,6 +285,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">the width of the input raster</td>
         </tr>
@@ -306,6 +322,10 @@
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">the height of the input raster</td>
@@ -341,9 +361,13 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">a list of named datasets. each must
-                                     have 'id', 'data', 'width' and 'height'.</td>
+            <td class="description last">a list of named datasets. each
+        must have 'id', 'data', 'width' and 'height'.</td>
         </tr>
 
     
@@ -379,9 +403,12 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">the color scale
-                                                                        image to use</td>
+            <td class="description last">the color scale image to use</td>
         </tr>
 
     
@@ -413,6 +440,10 @@
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">the name of a named color scale to use</td>
@@ -448,6 +479,12 @@
             
 
             
+                <td class="default">
+                
+                    [0, 1]
+                
+                </td>
+            
 
             <td class="description last">the value domain to scale the color</td>
         </tr>
@@ -482,9 +519,15 @@
             
 
             
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
 
             <td class="description last">whether or now values below the domain
-                                    shall be clamped</td>
+       shall be clamped</td>
         </tr>
 
     
@@ -517,9 +560,15 @@
             
 
             
+                <td class="default">
+                
+                    clampLow
+                
+                </td>
+            
 
-            <td class="description last">whether or now values above the domain
-                                     shall be clamped</td>
+            <td class="description last">whether or now values above the
+domain shall be clamped (if not defined defaults to clampLow value)</td>
         </tr>
 
     
@@ -552,9 +601,13 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
-            <td class="description last">the no-data value that shall always
-                                      hidden</td>
+            <td class="description last">the no-data value that shall
+        always be hidden</td>
         </tr>
 
     
@@ -587,8 +640,55 @@
             
 
             
+                <td class="default">
+                
+                    [1, 0, 0, 0, 1, 0, 0, 0, 1 ]
+                
+                </td>
+            
 
             <td class="description last">Transformation matrix</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>useWebGL</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">plotty can also function with pure javascript
+        but it is much slower then using WebGl rendering</td>
         </tr>
 
     
@@ -3122,6 +3222,136 @@ clamped to the minimum/maximum color.
     
 </dd>
 
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="setExpression"><span class="type-signature"></span>setExpression(expression)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Sets a mathematical expression to be evaluated on the plot. Expression can contain mathematical operations with integer/float values, dataset identifiers or GLSL supported functions with a single parameter.
+Supported mathematical operations are: add '+', subtract '-', multiply '*', divide '/', power '**', unary plus '+a', unary minus '-a'.
+Useful GLSL functions are for example: radians, degrees, sin, asin, cos, acos, tan, atan, log2, log, sqrt, exp2, exp, abs, sign, floor, ceil, fract.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>expression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Mathematical expression. Example: '-2 * sin(3.1415 - dataset1) ** 2'</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
         </dl>
     
 
@@ -3170,9 +3400,9 @@ clamped to the minimum/maximum color.
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
 	
-		on 2017-05-18T10:15:38+02:00
+		on 2019-06-13T17:35:49+02:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
