@@ -71,15 +71,15 @@ There is a list of predefined colorscales:
 
 |           |             |            |
 | --------- | ----------- | ---------- |
-| viridis   | inferno     | rainbow    |
-| jet       | hsv         | hot        |
-| cool      | spring      | summer     |
-| autumn    | winter      | bone       |
-| copper    | greys       | yignbu     |
-| greens    | yiorrd      | bluered    |
-| rdbu      | picnic      | portland   |
-| blackbody | earth       | electric   |
-| magma     | plasma      |            |
+| viridis   | inferno     | turbo      |
+| rainbow   | jet         | hsv        |
+| hot       | cool        | spring     |
+| summer    | autumn      | winter     |
+| bone      | copper      | greys      |
+| yignbu    | greens      | yiorrd     |
+| bluered   | rdbu        | picnic     | 
+| portland  | blackbody   | earth      | 
+| electric  | magma       | plasma     |
 
 
 It is also possible to define your own colorscale using the `addColorScale` function.
