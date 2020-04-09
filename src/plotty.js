@@ -177,6 +177,8 @@ uniform sampler2D u_textureData;
 uniform sampler2D u_textureScale;
 uniform vec2 u_textureSize;
 uniform vec2 u_domain;
+uniform vec2 u_display_range;
+uniform bool u_apply_display_range;
 uniform float u_noDataValue;
 uniform bool u_clampLow;
 uniform bool u_clampHigh;
@@ -187,6 +189,8 @@ void main() {
   float value = texture2D(u_textureData, v_texCoord)[0];
   if (value == u_noDataValue)
     gl_FragColor = vec4(0.0, 0, 0, 0.0);
+  else if (u_apply_display_range && (value < u_display_range[0] || value >= u_display_range[1]))
+        gl_FragColor = vec4(0.0, 0, 0, 0.0);
   else if ((!u_clampLow && value < u_domain[0]) || (!u_clampHigh && value > u_domain[1]))
     gl_FragColor = vec4(0, 0, 0, 0);
   else {
@@ -211,6 +215,10 @@ void main() {
  *        the color scale image to use
  * @param {String} [options.colorScale] the name of a named color scale to use
  * @param {Number[]} [options.domain=[0, 1]] the value domain to scale the color
+ * @param {Number[]} [options.displayRange=[0, 1]] range of values that will be
+ *        rendered, values outside of the range will be transparent
+ * @param {Boolean} [options.applyDisplayRange=false] set if displayRange should
+ *        be used
  * @param {Boolean} [options.clampLow=true] whether or now values below the domain
  *        shall be clamped
  * @param {Boolean} [options.clampHigh=clampLow] whether or now values above the
@@ -263,6 +271,8 @@ class plot {
       this.setColorScale(defaultFor(options.colorScale, 'viridis'));
     }
     this.setDomain(defaultFor(options.domain, [0, 1]));
+    this.displayRange = defaultFor(options.displayRange, [0, 1]);
+    this.applyDisplayRange = defaultFor(options.applyDisplayRange, false);
     this.setClamp(defaultFor(options.clampLow, true), options.clampHigh);
     this.setNoDataValue(options.noDataValue);
 
@@ -421,6 +431,20 @@ class plot {
       throw new Error('Invalid domain specified.');
     }
     this.domain = domain;
+  }
+
+  /**
+   * Set the display range that will be rendered, values outside of the range
+   * will not be rendered (transparent)
+   * @param {float[]} view range array in the form [min, max]
+   */
+  setDisplayRange(displayRange) {
+    if (!displayRange || displayRange.length !== 2) {
+      throw new Error('Invalid view range specified.');
+    }
+    this.displayRange = displayRange;
+    // When setting view range automatically enable the apply flag
+    this.applyDisplayRange = true;
   }
 
   /**
@@ -635,6 +659,12 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
       }
       const positionLocation = gl.getAttribLocation(program, 'a_position');
       const domainLocation = gl.getUniformLocation(program, 'u_domain');
+      const displayRangeLocation = gl.getUniformLocation(
+        program, 'u_display_range'
+      );
+      const applyDisplayRangeLocation = gl.getUniformLocation(
+        program, 'u_apply_display_range'
+      );
       const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
       const noDataValueLocation = gl.getUniformLocation(program, 'u_noDataValue');
       const clampLowLocation = gl.getUniformLocation(program, 'u_clampLow');
@@ -643,6 +673,8 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
 
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2fv(domainLocation, this.domain);
+      gl.uniform2fv(displayRangeLocation, this.displayRange);
+      gl.uniform1i(applyDisplayRangeLocation, this.applyDisplayRange);
       gl.uniform1i(clampLowLocation, this.clampLow);
       gl.uniform1i(clampHighLocation, this.clampHigh);
       gl.uniform1f(noDataValueLocation, this.noDataValue);
@@ -691,6 +723,9 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
           }
 
           if (data[i] === this.noDataValue) {
+            alpha = 0;
+          } else if (this.applyDisplayRange
+            && (data[i] < this.displayRange[0] || data[i] >= this.displayRange[1])) {
             alpha = 0;
           }
 

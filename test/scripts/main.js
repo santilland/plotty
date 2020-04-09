@@ -129,9 +129,14 @@ var matrix = [
 plot = new plotty.plot({
     canvas: el, width: width, height: height,
     domain: [min_range, max_range], colorScale: "viridis",
-    //useWebGL: false
-    //matrix : matrix
+    //useWebGL: false,
+    //matrix : matrix,
+    //displayRange: [min_range/2, max_range/2],
+    //applyDisplayRange: true
 });
+
+//plot.setDisplayRange([min_range/2, max_range/2]);
+
 plot.setClamp(clamp_low_check.checked, clamp_high_check.checked);
 
 plot.addDataset('dataset1', exampledata, width, height);
@@ -206,7 +211,8 @@ min_range_slider.oninput=function(){
     if(plot){
         min_range = parseFloat(this.value);
         min_label.innerHTML = min_range;
-        plot.setDomain([min_range, max_range],3);
+        plot.setDomain([min_range, max_range]);
+        //plot.setDisplayRange([min_range, max_range]);
         plot.render();
 
         /*drawHistogram(
@@ -230,7 +236,8 @@ max_range_slider.oninput=function(){
     if(plot){
         max_range = parseFloat(this.value);
         max_label.innerHTML = max_range;
-        plot.setDomain([min_range, max_range],3);
+        plot.setDomain([min_range, max_range]);
+        //plot.setDisplayRange([min_range, max_range]);
         plot.render();
 
         /*drawHistogram(
