@@ -710,7 +710,7 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
           const i = (y * w) + x;
           // TODO: Possible increase of performance through use of worker threads?
 
-          let c = Math.round(((data[i] - this.domain[0]) / trange) * steps);
+          let c = Math.floor(((data[i] - this.domain[0]) / trange) * (steps - 1));
           alpha = 255;
           if (c < 0) {
             c = 0;
