@@ -76,7 +76,7 @@ There is a list of predefined colorscales:
 | hot       | cool        | spring     |
 | summer    | autumn      | winter     |
 | bone      | copper      | greys      |
-| yignbu    | greens      | yiorrd     |
+| ylgnbu    | greens      | ylorrd     |
 | bluered   | rdbu        | picnic     | 
 | portland  | blackbody   | earth      | 
 | electric  | magma       | plasma     |

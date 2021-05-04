@@ -50,7 +50,7 @@ export const colorscales = {
     colors: ['#000000','#ffffff'],
     positions: [0,1]
   },
-  yignbu: {
+  ylgnbu: {
     colors: ['#081d58','#253494','#225ea8','#1d91c0','#41b6c4','#7fcdbb','#c7e9b4','#edf8d9','#ffffd9'],
     positions: [0,0.125,0.25,0.375,0.5,0.625,0.75,0.875,1]
   },
@@ -58,7 +58,7 @@ export const colorscales = {
     colors: ['#00441b','#006d2c','#238b45','#41ab5d','#74c476','#a1d99b','#c7e9c0','#e5f5e0','#f7fcf5'],
     positions: [0,0.125,0.25,0.375,0.5,0.625,0.75,0.875,1]
   },
-  yiorrd: {
+  ylorrd: {
     colors: ['#800026','#bd0026','#e31a1c','#fc4e2a','#fd8d3c','#feb24c','#fed976','#ffeda0','#ffffcc'],
     positions: [0,0.125,0.25,0.375,0.5,0.625,0.75,0.875,1]
   },
