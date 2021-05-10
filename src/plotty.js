@@ -735,7 +735,7 @@ ${ids.map(id => `          float ${id}_value = texture2D(u_texture_${id}, v_texC
           imageData.data[index + 0] = csImageData[c * 4];
           imageData.data[index + 1] = csImageData[(c * 4) + 1];
           imageData.data[index + 2] = csImageData[(c * 4) + 2];
-          imageData.data[index + 3] = alpha;
+          imageData.data[index + 3] = Math.min(alpha, csImageData[(c * 4) + 3]);
         }
       }
 
