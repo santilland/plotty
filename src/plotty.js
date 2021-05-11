@@ -239,30 +239,35 @@ class plot {
 
     this.setCanvas(options.canvas);
     // check if a webgl context is requested and available and set up the shaders
-    let gl;
 
-    // eslint-disable-next-line no-cond-assign
-    if (defaultFor(options.useWebGL, true) && (gl = create3DContext(this.canvas))) {
-      this.gl = gl;
+    if (defaultFor(options.useWebGL, true)) {
+      // Try to create a webgl context in a temporary canvas to see if webgl and
+      // required OES_texture_float is supported
+      if (create3DContext(document.createElement('canvas')) !== null) {
+        const gl = create3DContext(this.canvas);
+        this.gl = gl;
+        this.program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
+        gl.useProgram(this.program);
 
-      this.program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
-      gl.useProgram(this.program);
+        // look up where the vertex data needs to go.
+        const texCoordLocation = gl.getAttribLocation(this.program, 'a_texCoord');
 
-      // look up where the vertex data needs to go.
-      const texCoordLocation = gl.getAttribLocation(this.program, 'a_texCoord');
-
-      // provide texture coordinates for the rectangle.
-      this.texCoordBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        0.0, 0.0,
-        1.0, 0.0,
-        0.0, 1.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        1.0, 1.0]), gl.STATIC_DRAW);
-      gl.enableVertexAttribArray(texCoordLocation);
-      gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
+        // provide texture coordinates for the rectangle.
+        this.texCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+          0.0, 0.0,
+          1.0, 0.0,
+          0.0, 1.0,
+          0.0, 1.0,
+          1.0, 0.0,
+          1.0, 1.0]), gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(texCoordLocation);
+        gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
+      } else {
+        // Fall back to 2d context
+        this.ctx = this.canvas.getContext('2d');
+      }
     } else {
       this.ctx = this.canvas.getContext('2d');
     }
