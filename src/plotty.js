@@ -248,6 +248,7 @@ class plot {
         this.gl = gl;
         this.program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
         gl.useProgram(this.program);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 
         // look up where the vertex data needs to go.
         const texCoordLocation = gl.getAttribLocation(this.program, 'a_texCoord');
