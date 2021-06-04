@@ -243,12 +243,11 @@ class plot {
     if (defaultFor(options.useWebGL, true)) {
       // Try to create a webgl context in a temporary canvas to see if webgl and
       // required OES_texture_float is supported
-      if (create3DContext(document.createElement('canvas')) !== null) {
-        const gl = create3DContext(this.canvas);
+      if (create3DContext(document.createElement('canvas'), {premultipliedAlpha: false}) !== null) {
+        const gl = create3DContext(this.canvas, {premultipliedAlpha: false});
         this.gl = gl;
         this.program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
         gl.useProgram(this.program);
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 
         // look up where the vertex data needs to go.
         const texCoordLocation = gl.getAttribLocation(this.program, 'a_texCoord');
