@@ -189,7 +189,7 @@ void main() {
   float value = texture2D(u_textureData, v_texCoord)[0];
   if(value < -3.402823466e+38) // Check for possible NaN value
     gl_FragColor = vec4(0.0, 0, 0, 0.0);
-  else if (value == u_noDataValue)
+  else if (value == u_noDataValue || value != value)
     gl_FragColor = vec4(0.0, 0, 0, 0.0);
   else if (u_apply_display_range && (value < u_display_range[0] || value >= u_display_range[1]))
         gl_FragColor = vec4(0.0, 0, 0, 0.0);
