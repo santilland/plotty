@@ -184,12 +184,17 @@ uniform bool u_clampLow;
 uniform bool u_clampHigh;
 // the texCoords passed in from the vertex shader.
 varying vec2 v_texCoord;
+
+bool isnan( float val ) {
+  return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true;
+}
+
 void main() {
   vec2 onePixel = vec2(1.0, 1.0) / u_textureSize;
   float value = texture2D(u_textureData, v_texCoord)[0];
   if(value < -3.402823466e+38) // Check for possible NaN value
     gl_FragColor = vec4(0.0, 0, 0, 0.0);
-  else if (value == u_noDataValue || value != value)
+  else if (value == u_noDataValue || isnan(value))
     gl_FragColor = vec4(0.0, 0, 0, 0.0);
   else if (u_apply_display_range && (value < u_display_range[0] || value >= u_display_range[1]))
         gl_FragColor = vec4(0.0, 0, 0, 0.0);
